@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.1.xsd
+		http://www.springframework.org/schema/context  http://www.springframework.org/schema/context/spring-context-4.1.xsd"
+	default-lazy-init="true">
+
+	<description>Shiro Configuration</description>
+
+	<!-- 加载配置属性文件 -->
+	<context:property-placeholder
+		ignore-unresolvable="true" location="classpath:jeesite.properties" />
+
+	<!-- Shiro权限过滤过滤器定义 -->
+	<bean name="shiroFilterChainDefinitions" class="java.lang.String">
+		<constructor-arg>
+			<value>
+				${frontPath}/addUser* = anon
+				/static/** = anon
+				/wap/** = anon
+				/web/** = anon
+				/userfiles/** = anon
+				${frontPath}/register* = anon
+				${frontPath}/getArea* = anon
+				${frontPath}/getUserByMobile* = anon
+				${frontPath}/webUser/userBank/** = anon
+				${frontPath}/match/addMatchInfo = anon
+				${frontPath}/webUser/userAddr/** = anon
+				${frontPath}/webUser/userInfo/** = anon
+				${frontPath}/whuser/** = anon
+				${frontPath}/user/detailByKeyword* = anon
+				${frontPath}/user/parentName* = anon
+				${frontPath}/user/userBuyPig* = anon
+				${frontPath}/user/isOpenCommunication* = anon
+				${frontPath}/user/addSubuser* = anon
+				${frontPath}/user/yzUserMobile* = anon
+				${frontPath}/user/isOrNoUser* = anon
+				${frontPath}/user/appXiaZaiUrl* = anon
+				${frontPath}/user/userToShop* = anon
+				${frontPath}/${systemName}app/userinfo/forgetPassword = anon
+				${frontPath}/${systemName}app/userinfo/isCheckDevice = anon
+				${frontPath}/${systemName}/payment/offlineTransfer/** = anon
+				${frontPath}/app/userinfo/forgetPassword = anon
+				${frontPath}/transDetailByKeyword* = anon
+				${frontPath}/login = authc
+				${frontPath}/getVerificationCode = anon
+				${frontPath}/logout = logout
+				${frontPath}/webLogout = anon
+				${frontPath}/** = user
+				${frontPath}/** = multipleLoginCheck
+				${adminPath}/cas = cas
+				${adminPath}/login = adminUser
+				${adminPath}/logout = logout
+				${adminPath}/** = user
+				/act/editor/** = user
+				/ReportServer/** = user
+				/api/shopucapi/** = apiCheck
+				/payment/aliPay/** = anon
+				/payment/weiXPay/** = anon
+				/payment/huanxunPay/** = anon
+				/api/shopucapi/** = anon
+				/msm/lkMsm/** = anon
+				/wechat/core/** = anon
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="adminUser"
+		class="com.thinkgem.jeesite.modules.sys.security.FormAuthenticationFilter2">
+		<property name="loginUrl" value="${adminPath}/login" />
+		<property name="successUrl" value="${adminPath}" />
+	</bean>
+
+	<!-- 安全认证过滤器 -->
+	<bean id="shiroFilter" class="org.apache.shiro.spring.web.ShiroFilterFactoryBean">
+		<property name="securityManager" ref="securityManager" />
+		<property name="loginUrl" value="${frontPath}/login" />
+		<property name="successUrl" value="${frontPath}" />
+		<property name="filters">
+			<map>
+				<entry key="cas" value-ref="casFilter" />
+				<entry key="authc" value-ref="formAuthenticationFilter2" />
+				<entry key="adminUser" value-ref="adminUser" />
+				<entry key="user" value-ref="userAuthenticationFilter" />
+				<entry key="apiCheck" value-ref="apiCheckAuthenticationFilter" />
+				<entry key="multipleLoginCheck" value-ref="multipleLoginCheckFilter" />
+			</map>
+		</property>
+		<property name="filterChainDefinitions">
+			<ref bean="shiroFilterChainDefinitions" />
+		</property>
+	</bean>
+
+	<!-- CAS认证过滤器 -->
+	<bean id="casFilter" class="org.apache.shiro.cas.CasFilter">
+		<property name="failureUrl" value="${adminPath}/login" />
+	</bean>
+	
+	<!-- <bean id="adminRealm" class="com.thinkgem.jeesite.modules.sys.security.SystemAuthorizingRealm">
+    </bean>
+    
+    <bean id="websiteRealm" class="com.thinkgem.jeesite.modules.sys.security.WebUserAuthorizingRealm">
+    </bean>
+ -->
+	<!--多个realm 的集中管理 -->
+	<bean id="defineModularRealmAuthenticator" class="com.thinkgem.jeesite.modules.sys.security.DefautModularRealm"> 
+		<property name="definedRealms">    
+            <map>    
+                <entry key="adminRealm"><ref bean="systemAuthorizingRealm" /></entry>    
+                <entry key="websiteRealm" ><ref bean="webUserAuthorizingRealm" /></entry>
+            </map>   
+        </property> 
+		<property name="authenticationStrategy"> <bean class="org.apache.shiro.authc.pam.FirstSuccessfulStrategy" /> </property> 
+	</bean>
+
+	<!-- 定义Shiro安全管理配置 -->
+	<bean id="securityManager" class="org.apache.shiro.web.mgt.DefaultWebSecurityManager">
+		<!-- <property name="realm" ref="systemAuthorizingRealm" /> -->
+		<property name="authenticator" ref="defineModularRealmAuthenticator" />
+		<property name="realms">
+			<list>
+				<ref bean="systemAuthorizingRealm" />
+   				<ref bean="webUserAuthorizingRealm" />
+			</list>
+		</property>
+		<property name="sessionManager" ref="sessionManager" />
+		<property name="cacheManager" ref="shiroCacheManager" />
+	</bean>
+
+	<!-- 自定义会话管理配置 -->
+	<bean id="sessionManager"
+		class="com.thinkgem.jeesite.common.security.shiro.session.SessionManager">
+		<property name="sessionDAO" ref="sessionDAO" />
+
+		<!-- 会话超时时间，单位：毫秒 -->
+		<property name="globalSessionTimeout" value="${session.sessionTimeout}" />
+
+		<!-- 定时清理失效会话, 清理用户直接关闭浏览器造成的孤立会话 -->
+		<property name="sessionValidationInterval" value="${session.sessionTimeoutClean}" />
+		<!-- <property name="sessionValidationSchedulerEnabled" value="false"/> -->
+		<property name="sessionValidationSchedulerEnabled" value="true" />
+
+		<property name="sessionIdCookie" ref="sessionIdCookie" />
+		<property name="sessionIdCookieEnabled" value="true" />
+	</bean>
+
+	<!-- 指定本系统SESSIONID, 默认为: JSESSIONID 问题: 与SERVLET容器名冲突, 如JETTY, TOMCAT 等默认JSESSIONID, 
+		当跳出SHIRO SERVLET时如ERROR-PAGE容器会为JSESSIONID重新分配值导致登录会话丢失! -->
+	<bean id="sessionIdCookie" class="org.apache.shiro.web.servlet.SimpleCookie">
+		<constructor-arg name="name" value="jeesite.session.id" />
+	</bean>
+
+	<!-- 自定义Session存储容器 -->
+	<!-- <bean id="sessionDAO" class="com.thinkgem.jeesite.common.security.shiro.session.JedisSessionDAO"> -->
+	<!-- <property name="sessionIdGenerator" ref="idGen" /> -->
+	<!-- <property name="sessionKeyPrefix" value="${redis.keyPrefix}_session_" 
+		/> -->
+	<!-- </bean> -->
+	<bean id="sessionDAO"
+		class="com.thinkgem.jeesite.common.security.shiro.session.CacheSessionDAO">
+		<property name="sessionIdGenerator" ref="idGen" />
+		<property name="activeSessionsCacheName" value="activeSessionsCache" />
+		<property name="cacheManager" ref="shiroCacheManager" />
+	</bean>
+
+	<!-- 自定义系统缓存管理器 -->
+	<!-- <bean id="shiroCacheManager" class="com.thinkgem.jeesite.common.security.shiro.cache.JedisCacheManager"> -->
+	<!-- <property name="cacheKeyPrefix" value="${redis.keyPrefix}_cache_" /> -->
+	<!-- </bean> -->
+	<bean id="shiroCacheManager" class="org.apache.shiro.cache.ehcache.EhCacheManager">
+		<property name="cacheManager" ref="cacheManager" />
+	</bean>
+
+	<!-- 保证实现了Shiro内部lifecycle函数的bean执行 -->
+	<bean id="lifecycleBeanPostProcessor" class="org.apache.shiro.spring.LifecycleBeanPostProcessor" />
+
+	<!-- AOP式方法级权限检查 -->
+	<bean
+		class="org.springframework.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreator"
+		depends-on="lifecycleBeanPostProcessor">
+		<property name="proxyTargetClass" value="true" />
+	</bean>
+	<bean
+		class="org.apache.shiro.spring.security.interceptor.AuthorizationAttributeSourceAdvisor">
+		<property name="securityManager" ref="securityManager" />
+	</bean>
+
+</beans>

@@ -1,0 +1,380 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.user.dao.UserReportDao">
+
+    <sql id="userReportColumns">
+		a.id AS "id",
+		a.user_name AS "userName",
+		a.dividend_one AS "dividendOne",
+		a.dividend_two AS "dividendTwo",
+		a.dividend_three AS "dividendThree",
+		a.dividend_four AS "dividendFour",
+		a.dividend_five AS "dividendFive",
+		a.dividend_six AS "dividendSix",
+		a.dividend_seven AS "dividendSeven",
+		a.dividend_eight AS "dividendEight",
+		a.dividend_nine AS "dividendNine",
+		a.dividend_ten AS "dividendTen",
+		a.dividend_eleven AS "dividendEleven",
+		a.dividend_twelve AS "dividendTwelve",
+		a.dividend_thirteen AS "dividendThirteen",
+		a.dividend_fourteen AS "dividendFourteen",
+		a.dividend_fifteen AS "dividendFifteen",
+		a.is_check AS "isCheck",
+		a.status AS "status",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		u.true_name AS "userUserinfo.trueName",
+		u.office_id AS "userUserinfo.officeId",
+		u.id  AS "userUserinfo.id"
+	</sql>
+
+    <sql id="userReportJoins">
+		LEFT JOIN user_userinfo u ON u.user_name = a.user_name
+	</sql>
+
+    <select id="get" resultType="UserReport">
+        SELECT
+        <include refid="userReportColumns"/>
+        FROM user_report a
+        <include refid="userReportJoins"/>
+        WHERE a.id = #{id}
+    </select>
+
+    <select id="findList" resultType="UserReport">
+        SELECT
+
+        <include refid="userReportColumns"/>
+        FROM user_report a
+        <include refid="userReportJoins"/>
+        <where>
+            a.del_flag = #{DEL_FLAG_NORMAL}
+            <if test="userName != null and userName != ''">
+                AND a.user_name = #{userName}
+            </if>
+            <if test="trueName != null and trueName != ''">
+                AND u.true_name = #{trueName}
+            </if>
+            <if test="createDate != null and createDate != ''">
+                AND DATE_FORMAT(a.create_date, '%Y-%m-%d') = DATE_FORMAT(#{createDate}, '%Y-%m-%d')
+            </if>
+            <if test="createDateByDate != null and createDateByDate != ''">
+                and date_format(a.create_date, '%y-%m-%d') = date_format(#{createDateByDate}, '%y-%m-%d')
+            </if>
+            <if test="userUserinfo != null">
+                <if test="userUserinfo.officeId != null and userUserinfo.officeId != ''">
+                    AND u.office_id = #{userUserinfo.officeId}
+                </if>
+            </if>
+            <if test="userUserinfo != null and userUserinfo.parentListLike != null and userUserinfo.parentListLike != ''">
+                AND (u.id = #{userUserinfo.parentListLike} OR u.parent_list like
+                concat('%/',#{userUserinfo.parentListLike},'/%'))
+            </if>
+            <if test="createDateBegin != null and createDateBegin != ''">
+                AND  date_format(a.create_date, '%y-%m-%d') &gt;= date_format(#{createDateBegin}, '%y-%m-%d')
+            </if>
+            <if test="createDateEnd != null and createDateEnd != ''">
+                AND date_format(a.create_date, '%y-%m-%d') &lt;= date_format(#{createDateEnd}, '%y-%m-%d')
+            </if>
+            <if test="isCheck != null and isCheck != ''">
+                AND a.is_check = #{isCheck}
+            </if>
+            <if test="status != null and status != ''">
+                AND a.status = #{status}
+            </if>
+        </where>
+        <choose>
+            <when test="page !=null and page.orderBy != null and page.orderBy != ''">
+                ORDER BY ${page.orderBy}
+            </when>
+            <when test="orderBy !=null and orderBy != ''">
+                ORDER BY ${orderBy}
+            </when>
+            <otherwise>
+                ORDER BY a.id DESC
+            </otherwise>
+        </choose>
+        <if test="topLimit != null and topLimit != '' ">
+            limit 0,#{topLimit}
+        </if>
+    </select>
+
+    <select id="getOrganReport" resultType="UserReport">
+        SELECT
+        count(a.user_name) AS "userName",
+        sum(a.dividend_one) AS "dividendOne",
+        sum(a.dividend_two) AS "dividendTwo",
+        sum(a.dividend_three) AS "dividendThree",
+        sum(a.dividend_four) AS "dividendFour",
+        sum(a.dividend_five) AS "dividendFive",
+        sum(a.dividend_six) AS "dividendSix",
+        sum(a.dividend_seven) AS "dividendSeven",
+        sum(a.dividend_eight) AS "dividendEight",
+        sum(a.dividend_nine) AS "dividendNine",
+        sum(a.dividend_ten) AS "dividendTen"
+        FROM user_report a
+        LEFT JOIN user_userinfo u ON u.user_name = a.user_name
+        LEFT JOIN sys_office so ON u.office_id = so.id
+        <where>
+            <choose>
+                <when test="officeArray != null and officeArray.length > 0">
+                    u.office_id IN
+                    <foreach item="id" index="index" collection="officeArray" open="(" separator="," close=")">
+                        #{id}
+                    </foreach>
+                </when>
+                <otherwise>
+                    a.id = NULL
+                </otherwise>
+            </choose>
+            <if test="createDate != null and createDate != ''">
+                AND DATE_FORMAT(a.create_date, '%Y-%m-%d') = DATE_FORMAT(#{createDate}, '%Y-%m-%d')
+            </if>
+        </where>
+    </select>
+
+    <select id="findQuarterList" resultType="UserReport">
+        SELECT
+        sum(a.dividend_two) + sum(a.dividend_four) AS "dividendFour",
+        u.true_name AS  "trueName"
+        FROM user_report a
+        LEFT JOIN user_userinfo u ON u.user_name = a.user_name
+        <where>
+
+            date_format(a.create_date, '%y-%m-%d') &gt;= date_format(#{startDate}, '%y-%m-%d') AND
+            date_format(a.create_date, '%y-%m-%d') &lt;= date_format(#{lastDate}, '%y-%m-%d')
+
+        </where>
+        GROUP BY a.user_name ORDER BY dividendFour DESC LIMIT #{topLimit}
+    </select>
+
+    <select id="findListSum" resultType="UserReport">
+        SELECT a.user_name, sum(dividend_one) AS dividend_one,sum(dividend_two) AS dividend_two,sum(dividend_four) AS dividend_four,
+        u.true_name AS  "trueName",ul.level_name AS "userUserinfo.userLevel.levelName"
+        FROM user_report a
+        LEFT JOIN user_userinfo u ON u.user_name = a.user_name
+        LEFT JOIN user_level ul ON u.user_level_id = ul.level_code
+        <where>
+            <if test="userName != null and userName != ''">
+                AND u.user_name = #{userName}
+            </if>
+            <if test="createDateByDate != null and createDateByDate != ''">
+                and date_format(a.create_date, '%y-%m') = date_format(#{createDateByDate}, '%y-%m')
+            </if>
+            <if test="createDateBegin != null and createDateBegin != ''">
+                AND date_format(a.create_date, '%y-%m-%d') &gt;= date_format(#{createDateBegin}, '%y-%m-%d')
+            </if>
+            <if test="createDateEnd != null and createDateEnd != ''">
+                AND date_format(a.create_date, '%y-%m-%d') &lt;= date_format(#{createDateEnd}, '%y-%m-%d')
+            </if>
+        </where>
+        GROUP BY a.user_name
+    </select>
+
+    <select id="sumUserReport" resultType="UserReport">
+        SELECT
+        sum(a.dividend_one) AS "dividendOne",
+        sum(a.dividend_two) AS "dividendTwo",
+        sum(a.dividend_three) AS "dividendThree",
+        sum(a.dividend_four) AS "dividendFour",
+        sum(a.dividend_five) AS "dividendFive",
+        sum(a.dividend_six) AS "dividendSix",
+        sum(a.dividend_seven) AS "dividendSeven",
+        sum(a.dividend_eight) AS "dividendEight",
+        sum(a.dividend_nine) AS "dividendNine",
+        sum(a.dividend_ten) AS "dividendTen",
+        sum(a.dividend_eleven) AS "dividendEleven",
+        sum(a.dividend_twelve) AS "dividendTwelve",
+        sum(a.dividend_thirteen) AS "dividendThirteen",
+        sum(a.dividend_fourteen) AS "dividendFourteen",
+        sum(a.dividend_fifteen) AS "dividendFifteen"
+        FROM user_report a
+        <where>
+            1=1
+            <if test="createDateBegin != null and createDateBegin != ''">
+                AND date_format(a.create_date, '%y-%m-%d') &gt;= date_format(#{createDateBegin}, '%y-%m-%d')
+            </if>
+            <if test="createDateEnd != null and createDateEnd != ''">
+                AND date_format(a.create_date, '%y-%m-%d') &lt;= date_format(#{createDateEnd}, '%y-%m-%d')
+            </if>
+        </where>
+    </select>
+
+    <select id="getTeamReport" resultType="UserReport">
+        SELECT
+        u.user_name AS "userUserinfo.userName",
+        u.true_name AS "userUserinfo.trueName",
+        count(a.user_name) AS "userName",
+        sum(a.dividend_one) AS "dividendOne",
+        sum(a.dividend_two) AS "dividendTwo",
+        sum(a.dividend_three) AS "dividendThree",
+        sum(a.dividend_four) AS "dividendFour",
+        sum(a.dividend_five) AS "dividendFive",
+        sum(a.dividend_six) AS "dividendSix",
+        sum(a.dividend_seven) AS "dividendSeven",
+        sum(a.dividend_eight) AS "dividendEight",
+        sum(a.dividend_nine) AS "dividendNine",
+        sum(a.dividend_ten) AS "dividendTen"
+        FROM user_report a
+        LEFT JOIN user_userinfo u ON u.user_name = a.user_name
+        <where>
+            <if test="createDate != null and createDate != ''">
+                AND DATE_FORMAT(a.create_date, '%Y-%m-%d') = DATE_FORMAT(#{createDate}, '%Y-%m-%d')
+            </if>
+            AND (u.id = #{userUserinfo.parentListLike} OR u.parent_list like
+            concat('%/',#{userUserinfo.parentListLike},'/%'))
+        </where>
+    </select>
+
+    <insert id="insert">
+		INSERT INTO user_report(
+		id,
+		user_name,
+		dividend_one,
+		dividend_two,
+		dividend_three,
+		dividend_four,
+		dividend_five,
+		dividend_six,
+		dividend_seven,
+		dividend_eight,
+		dividend_nine,
+		dividend_ten,
+		dividend_eleven ,
+		dividend_twelve ,
+		dividend_thirteen ,
+		dividend_fourteen ,
+		dividend_fifteen,
+		is_check,
+		status,
+		create_by,
+		create_date,
+		update_by,
+		update_date,
+		remarks,
+		del_flag
+		) VALUES (
+			#{id},
+			#{userName},
+			#{dividendOne},
+			#{dividendTwo},
+			#{dividendThree},
+			#{dividendFour},
+			#{dividendFive},
+			#{dividendSix},
+			#{dividendSeven},
+			#{dividendEight},
+			#{dividendNine},
+			#{dividendTen},
+			#{dividendEleven},
+			#{dividendTwelve},
+			#{dividendThirteen},
+			#{dividendFourteen},
+			#{dividendFifteen},
+			#{isCheck},
+			#{status},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+
+		)
+	</insert>
+
+    <update id="update">
+		UPDATE user_report SET
+			user_name = #{userName},
+			dividend_one = #{dividendOne},
+			dividend_two = #{dividendTwo},
+			dividend_three = #{dividendThree},
+			dividend_four = #{dividendFour},
+			dividend_five = #{dividendFive},
+			dividend_six = #{dividendSix},
+			dividend_seven = #{dividendSeven},
+			dividend_eight = #{dividendEight},
+			dividend_nine = #{dividendNine},
+			dividend_ten = #{dividendTen},
+			dividend_eleven = #{dividendEleven},
+			dividend_twelve= #{dividendTwelve},
+			dividend_thirteen= #{dividendThirteen},
+			dividend_fourteen =#{dividendFourteen},
+			dividend_fifteen = #{dividendFifteen},
+			is_check = #{isCheck},
+			status = #{status},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+
+    <update id="updateUserReportByType">
+        UPDATE user_report SET
+        <choose>
+            <when test="reportType==1">
+                dividend_one = dividend_one + #{money}
+            </when>
+            <when test="reportType==2">
+                dividend_two = dividend_two + #{money}
+            </when>
+            <when test="reportType==3">
+                dividend_three = dividend_three + #{money}
+            </when>
+            <when test="reportType==4">
+                dividend_four = dividend_four + #{money}
+            </when>
+            <when test="reportType==5">
+                dividend_five = dividend_five + #{money}
+            </when>
+            <when test="reportType==6">
+                dividend_six = dividend_six + #{money}
+            </when>
+            <when test="reportType==7">
+                dividend_seven = dividend_seven + #{money}
+            </when>
+            <when test="reportType==8">
+                dividend_eight = dividend_eight + #{money}
+            </when>
+            <when test="reportType==9">
+                dividend_nine = dividend_nine + #{money}
+            </when>
+            <when test="reportType==10">
+                dividend_ten = dividend_ten + #{money}
+            </when>
+            <when test="reportType==11">
+                dividend_eleven = dividend_eleven + #{money}
+            </when>
+            <when test="reportType==12">
+                dividend_twelve = dividend_twelve + #{money}
+            </when>
+            <when test="reportType==13">
+                dividend_thirteen = dividend_thirteen + #{money}
+            </when>
+            <when test="reportType==14">
+                dividend_fourteen = dividend_fourteen + #{money}
+            </when>
+            <when test="reportType==15">
+                dividend_fifteen = dividend_fifteen + #{money}
+            </when>
+        </choose>
+        WHERE id = #{id}
+    </update>
+
+    <select id="sumFuHuaMoney" resultType="UserReport">
+        SELECT sum(dividend_two) dividend_two,sum(dividend_three) dividend_three,sum(dividend_four) dividend_four,sum(dividend_five) dividend_five,sum(dividend_six) dividend_six,sum(dividend_seven) dividend_seven,sum(dividend_eight) dividend_eight,sum(dividend_ten) dividend_ten,sum(dividend_eleven) dividend_eleven,sum(dividend_twelve) dividend_twelve,sum(dividend_thirteen) dividend_thirteen,create_date,DATE_FORMAT(a.create_date, '%Y-%m-%d') as time FROM `user_report` a GROUP BY time ORDER BY time DESC
+    </select>
+
+    <select id="getByUserNameAndDate" resultType="UserReport">
+        SELECT * FROM user_report WHERE user_name = #{userName} AND DATE_FORMAT(create_date, '%Y-%m-%d') = DATE_FORMAT(#{date}, '%Y-%m-%d') limit 1
+    </select>
+
+    <update id="delete">
+		delete  from  user_report
+		WHERE id = #{id}
+	</update>
+
+</mapper>

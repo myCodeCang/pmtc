@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.user.dao.UserMsmDao">
+    
+	<sql id="userMsmColumns">
+		a.id AS "id",
+		a.user_name AS "mobile",
+		a.msg AS "msg",
+		a.create_time AS "createTime"
+	</sql>
+	
+	<sql id="userMsmJoins">
+	</sql>
+    
+	<select id="get" resultType="UserMsm">
+		SELECT 
+			<include refid="userMsmColumns"/>
+		FROM user_msm a
+		<include refid="userMsmJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="UserMsm">
+		SELECT 
+
+			<include refid="userMsmColumns"/>
+		FROM user_msm a
+		<include refid="userMsmJoins"/>
+		<where>
+			
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+
+	
+	<insert id="insert">
+		INSERT INTO user_msm(
+			id,
+			user_name,
+			msg,
+			create_time
+		) VALUES (
+			#{id},
+			#{mobile},
+			#{msg},
+			#{createTime}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE user_msm SET 	
+			user_name = #{mobile},
+			msg = #{msg},
+			create_time = #{createTime}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		DELETE FROM user_msm
+		WHERE id = #{id}
+	</update>
+
+	<select id="getByMobile" resultType="UserMsm">
+		SELECT
+		<include refid="userMsmColumns"/>
+		FROM user_msm a
+		<include refid="userMsmJoins"/>
+		WHERE a.user_name = #{mobile}
+		limit 1
+	</select>
+
+	<update id="updateMsg">
+		UPDATE user_msm SET
+		msg = #{msg},
+		create_time = #{createTime}
+		WHERE user_name = #{mobile}
+	</update>
+</mapper>

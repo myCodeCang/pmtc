@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.shop.dao.ShopCategoryDao">
+    
+	<sql id="shopCategoryColumns">
+		a.id AS "id",
+		a.uniacid AS "uniacid",
+		a.name AS "name",
+		a.thumb AS "thumb",
+		a.parentid AS "parentid",
+		a.isrecommand AS "isrecommand",
+		a.description AS "description",
+		a.displayorder AS "displayorder",
+		a.enabled AS "enabled",
+		a.ishome AS "ishome",
+		a.level AS "level",
+		a.advimg AS "advimg",
+		a.advurl AS "advurl",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="shopCategoryJoins">
+	</sql>
+    
+	<select id="get" resultType="ShopCategory">
+		SELECT 
+			<include refid="shopCategoryColumns"/>
+		FROM shop_category a
+		<include refid="shopCategoryJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="ShopCategory">
+		SELECT 
+
+			<include refid="shopCategoryColumns"/>
+		FROM shop_category a
+		<include refid="shopCategoryJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="name != null and name != ''">
+				AND a.name LIKE 
+					<if test="dbName == 'oracle'">'%'||#{name}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{name}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{name},'%')</if>
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="ShopCategory">
+		SELECT 
+			<include refid="shopCategoryColumns"/>
+		FROM shop_category a
+		<include refid="shopCategoryJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO shop_category(
+			id,
+			uniacid,
+			name,
+			thumb,
+			parentid,
+			isrecommand,
+			description,
+			displayorder,
+			enabled,
+			ishome,
+			level,
+			advimg,
+			advurl,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{uniacid},
+			#{name},
+			#{thumb},
+			#{parentid},
+			#{isrecommand},
+			#{description},
+			#{displayorder},
+			#{enabled},
+			#{ishome},
+			#{level},
+			#{advimg},
+			#{advurl},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE shop_category SET 	
+			uniacid = #{uniacid},
+			name = #{name},
+			thumb = #{thumb},
+			parentid = #{parentid},
+			isrecommand = #{isrecommand},
+			description = #{description},
+			displayorder = #{displayorder},
+			enabled = #{enabled},
+			ishome = #{ishome},
+			level = #{level},
+			advimg = #{advimg},
+			advurl = #{advurl},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE shop_category SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

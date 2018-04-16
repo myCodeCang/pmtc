@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.user.dao.UserBankCommonDao">
+    
+	<sql id="userBankCommonColumns">
+		a.id AS "id",
+		a.bank_code AS "bankCode",
+		a.name AS "name",
+		a.image AS "image",
+		a.status AS "status",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="userBankCommonJoins">
+	</sql>
+    
+	<select id="get" resultType="UserBankCommon">
+		SELECT 
+			<include refid="userBankCommonColumns"/>
+		FROM user_bank_common a
+		<include refid="userBankCommonJoins"/>
+		WHERE a.id = #{id}
+	</select>
+
+	<select id="getByBankCode" resultType="UserBankCommon">
+		SELECT
+		<include refid="userBankCommonColumns"/>
+		FROM user_bank_common a
+		<include refid="userBankCommonJoins"/>
+		WHERE a.bank_code = #{bankCode}
+	</select>
+	
+	<select id="findList" resultType="UserBankCommon">
+		SELECT 
+			<include refid="userBankCommonColumns"/>
+		FROM user_bank_common a
+		<include refid="userBankCommonJoins"/>
+		<where>
+			<if test="name != null and name != ''">
+				AND a.name LIKE 
+					<if test="dbName == 'oracle'">'%'||#{name}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{name}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{name},'%')</if>
+			</if>
+			<if test="status != null and status != ''">
+				AND a.status = #{status}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<when test="orderBy !=null and orderBy != ''">
+				ORDER BY ${orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.id DESC
+			</otherwise>
+		</choose>
+		<if test="topLimit != null and topLimit != '' ">
+			limit 0,#{topLimit}
+		</if>
+	</select>
+
+	
+	<insert id="insert">
+		INSERT INTO user_bank_common(
+			id,
+			bank_code,
+			name,
+			image,
+			status,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{bankCode},
+			#{name},
+			#{image},
+			#{status},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE user_bank_common SET 	
+			bank_code = #{bankCode},
+			name = #{name},
+			image = #{image},
+			status = #{status},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		delete from  user_bank_common
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

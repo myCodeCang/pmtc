@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.wechat.dao.SysWxKeywordDao">
+    
+	<sql id="sysWxKeywordColumns">
+		a.id AS "id",
+		a.keyword AS "keyword",
+		a.reply AS "reply",
+		a.msg_type AS "msgType"
+	</sql>
+	
+	<sql id="sysWxKeywordJoins">
+	</sql>
+    
+	<select id="get" resultType="SysWxKeyword">
+		SELECT 
+			<include refid="sysWxKeywordColumns"/>
+		FROM sys_wx_keyword a
+		<include refid="sysWxKeywordJoins"/>
+		WHERE a.id = #{id}
+	</select>
+
+	<select id="findByKey" resultType="SysWxKeyword">
+		SELECT
+		<include refid="sysWxKeywordColumns"/>
+		FROM sys_wx_keyword a
+		<include refid="sysWxKeywordJoins"/>
+		WHERE a.keyword = #{keyword}
+	</select>
+	
+	<select id="findList" resultType="SysWxKeyword">
+		SELECT 
+
+			<include refid="sysWxKeywordColumns"/>
+		FROM sys_wx_keyword a
+		<include refid="sysWxKeywordJoins"/>
+		<where>
+			
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="SysWxKeyword">
+		SELECT 
+			<include refid="sysWxKeywordColumns"/>
+		FROM sys_wx_keyword a
+		<include refid="sysWxKeywordJoins"/>
+		<where>
+			
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO sys_wx_keyword(
+			id,
+			keyword,
+			reply,
+			msg_type
+		) VALUES (
+			#{id},
+			#{keyword},
+			#{reply},
+			#{msgType}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE sys_wx_keyword SET 	
+			keyword = #{keyword},
+			reply = #{reply},
+			msg_type = #{msgType}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		DELETE FROM sys_wx_keyword
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.user.dao.UserChargeDao">
+    
+	<sql id="userChargeColumns">
+		a.id AS "id",
+		a.user_name AS "userName",
+		a.recordcode AS "recordcode",
+		a.change_money AS "changeMoney",
+		a.commt AS "commt",
+		a.status AS "status",
+		a.ischeck AS "ischeck",
+		a.change_type AS "changeType",
+		a.bank_code AS "bankCode",
+		a.bank_image AS "bankImage",
+		a.bank_num AS "bankNum",
+		a.bank_user AS "bankUser",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		b.name AS  "bankName",
+		c.true_name AS  "trueName"
+	</sql>
+	
+	<sql id="userChargeJoins">
+		  left join user_bank_common  b  on a.bank_code = b.bank_code
+		  left join user_userinfo c on c.user_name = a.user_name
+	</sql>
+    
+	<select id="get" resultType="UserCharge">
+		SELECT 
+			<include refid="userChargeColumns"/>
+		FROM user_charge a
+		<include refid="userChargeJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="UserCharge">
+		SELECT 
+
+			<include refid="userChargeColumns"/>
+		FROM user_charge a
+		<include refid="userChargeJoins"/>
+		<where>
+			<if test="userName != null and userName != ''">
+				AND a.user_name = #{userName}
+			</if>
+			<if test="isDispose == 0">
+				AND a.status = 0
+			</if>
+			<if test="isDispose == 1">
+				AND a.status != 0
+			</if>
+			<if test="status != null and status != ''">
+				AND a.status = #{status}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<when test="orderBy !=null and orderBy != ''">
+				ORDER BY ${orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.id DESC
+			</otherwise>
+		</choose>
+		<if test="topLimit != null and topLimit != '' ">
+			limit 0,#{topLimit}
+		</if>
+	</select>
+
+	<insert id="insert">
+		INSERT INTO user_charge(
+			id,
+			user_name,
+			recordcode,
+			change_money,
+			commt,
+			status,
+			ischeck,
+			change_type,
+			bank_code,
+			bank_image,
+			bank_num,
+			bank_user,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{userName},
+			#{recordcode},
+			#{changeMoney},
+			#{commt},
+			#{status},
+			#{ischeck},
+			#{changeType},
+			#{bankCode},
+			#{bankImage},
+			#{bankNum},
+			#{bankUser},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	<update id="updateStatus">
+		UPDATE user_charge SET
+		status = #{status}
+		WHERE id = #{id}
+	</update>
+</mapper>

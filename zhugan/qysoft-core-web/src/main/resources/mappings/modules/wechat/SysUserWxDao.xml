@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.wechat.dao.SysUserWxDao">
+    
+	<sql id="sysUserWxColumns">
+		a.id AS "id",
+		a.open_id AS "openId",
+		a.user_id AS "user.id",
+		a.union_id AS "unionId",
+		a.wx_img AS "wxImg",
+		a.wx_member AS "wxMember",
+		a.wx_nickname AS "wxNickname",
+		a.create_date AS "createDate",
+		a.update_date AS "updateDate",
+		a.del_flag AS "delFlag",
+		a.is_subscribe AS "isSubscribe"
+	</sql>
+	
+	<sql id="sysUserWxJoins">
+		/*LEFT JOIN user_userinfo u3 ON u3.id = a.user_id*/
+	</sql>
+    
+	<select id="get" resultType="SysUserWx">
+		SELECT 
+			<include refid="sysUserWxColumns"/>
+		FROM sys_user_wx a
+		<include refid="sysUserWxJoins"/>
+		WHERE a.id = #{id}
+	</select>
+
+	<select id="findByOpenId" resultType="SysUserWx">
+		SELECT
+		<include refid="sysUserWxColumns"/>
+		FROM sys_user_wx a
+
+		WHERE a.open_id = #{openId}
+	</select>
+	
+	<select id="findList" resultType="SysUserWx">
+		SELECT 
+
+			<include refid="sysUserWxColumns"/>
+		FROM sys_user_wx a
+		<include refid="sysUserWxJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="SysUserWx">
+		SELECT 
+			<include refid="sysUserWxColumns"/>
+		FROM sys_user_wx a
+		<include refid="sysUserWxJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO sys_user_wx(
+			id,
+			open_id,
+			user_id,
+			union_id,
+			wx_img,
+			wx_member,
+			wx_nickname,
+			create_date,
+			update_date,
+			del_flag,
+			is_subscribe
+		) VALUES (
+			#{id},
+			#{openId},
+			#{user.id},
+			#{unionId},
+			#{wxImg},
+			#{wxMember},
+			#{wxNickname},
+			#{createDate},
+			#{updateDate},
+			#{delFlag},
+			#{isSubscribe}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE sys_user_wx SET 	
+			open_id = #{openId},
+			user_id = #{user.id},
+			union_id = #{unionId},
+			wx_img = #{wxImg},
+			wx_member = #{wxMember},
+			wx_nickname = #{wxNickname},
+			update_date = #{updateDate},
+			is_subscribe = #{isSubscribe}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE sys_user_wx SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+
+	<update id="changeSubscribeStatus">
+		UPDATE sys_user_wx SET
+		is_subscribe = #{isSubscribe}
+		WHERE id = #{id}
+	</update>
+</mapper>

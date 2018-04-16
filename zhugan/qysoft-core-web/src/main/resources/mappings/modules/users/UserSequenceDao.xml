@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.user.dao.UserSequenceDao">
+    
+	<sql id="userSequenceColumns">
+		a.id AS "id",
+		a.name AS "name",
+		a.current_value AS "currentValue",
+		a.increment AS "increment",
+		a.remarks AS "remarks"
+	</sql>
+	
+	<sql id="userSequenceJoins">
+	</sql>
+    
+	<select id="get" resultType="UserSequence">
+		SELECT 
+			<include refid="userSequenceColumns"/>
+		FROM user_sequence a
+		<include refid="userSequenceJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="UserSequence">
+		SELECT 
+			<include refid="userSequenceColumns"/>
+		FROM user_sequence a
+		<include refid="userSequenceJoins"/>
+		<where>
+			<if test="name != null and name != ''">
+				AND a.name = #{name}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<when test="orderBy !=null and orderBy != ''">
+				ORDER BY ${orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.id DESC
+			</otherwise>
+		</choose>
+		<if test="topLimit != null and topLimit != '' ">
+			limit 0,#{topLimit}
+		</if>
+	</select>
+	
+	<select id="findAllList" resultType="UserSequence">
+		SELECT 
+			<include refid="userSequenceColumns"/>
+		FROM user_sequence a
+		<include refid="userSequenceJoins"/>
+		<where>
+			
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO user_sequence(
+			name,
+			current_value,
+			increment,
+			remarks
+		) VALUES (
+			#{name},
+			#{currentValue},
+			#{increment},
+			#{remarks}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE user_sequence SET 	
+			name = #{name},
+			current_value = #{currentValue},
+			increment = #{increment},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		DELETE FROM user_sequence
+		WHERE id = #{id}
+	</update>
+
+	<select id="getNextSequence" resultType="String">
+		select nextval(#{seqName})
+	</select>
+
+	<select id="getCurrSequence" resultType="String">
+		select currval(#{seqName})
+	</select>
+
+</mapper>

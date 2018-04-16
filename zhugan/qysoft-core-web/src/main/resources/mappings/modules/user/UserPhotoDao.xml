@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.user.dao.UserPhotoDao">
+    
+	<sql id="userPhotoColumns">
+		a.id AS "id",
+		a.keyword AS "keyword",
+		a.name AS "name",
+		a.photo AS "photo",
+		a.url AS "url",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="userPhotoJoins">
+	</sql>
+    
+	<select id="get" resultType="UserPhoto">
+		SELECT 
+			<include refid="userPhotoColumns"/>
+		FROM user_photo a
+		<include refid="userPhotoJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="UserPhoto">
+		SELECT 
+
+			<include refid="userPhotoColumns"/>
+		FROM user_photo a
+		<include refid="userPhotoJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="keyword != null and keyword != ''">
+				AND a.keyword = #{keyword}
+			</if>
+			<if test="name != null and name != ''">
+				AND a.name LIKE 
+					<if test="dbName == 'oracle'">'%'||#{name}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{name}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{name},'%')</if>
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<when test="orderBy !=null and orderBy != ''">
+				ORDER BY ${orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	
+	<insert id="insert">
+		INSERT INTO user_photo(
+			id,
+			keyword,
+			name,
+			photo,
+			url,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{keyword},
+			#{name},
+			#{photo},
+			#{url},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE user_photo SET 	
+			keyword = #{keyword},
+			name = #{name},
+			photo = #{photo},
+			url = #{url},
+			status = #{status},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		delete from user_photo
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

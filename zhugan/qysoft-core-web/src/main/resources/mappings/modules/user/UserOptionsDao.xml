@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.user.dao.UserOptionsDao">
+    
+	<sql id="userOptionsColumns">
+		a.id AS "id",
+		a.option_name AS "optionName",
+		a.option_value AS "optionValue",
+		a.autoload AS "autoload",
+		a.group_name As "groupName",
+		a.option_label As "optionLabel"
+	</sql>
+	
+	<sql id="userOptionsJoins">
+	</sql>
+    
+	<select id="get" resultType="UserOptions">
+		SELECT 
+			<include refid="userOptionsColumns"/>
+		FROM user_options a
+		<include refid="userOptionsJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="getByOptionName" resultType="UserOptions">
+		SELECT 
+			<include refid="userOptionsColumns"/>
+		FROM user_options a
+		<include refid="userOptionsJoins"/>
+		WHERE a.option_name = #{optName}
+	</select>
+	
+	
+	<select id="getByGroupName" resultType="UserOptions">
+		SELECT 
+			<include refid="userOptionsColumns"/>
+		FROM user_options a
+		<include refid="userOptionsJoins"/>
+		WHERE a.group_name = #{groupName}
+	</select>
+	
+	
+	
+	
+	<select id="findList" resultType="UserOptions">
+		SELECT 
+		@rownum:=@rownum+1 as rownum,
+			<include refid="userOptionsColumns"/>
+		FROM user_options a join (select @rownum := 0) tmp_row_number 
+		<include refid="userOptionsJoins"/>
+		<where>
+			
+			<if test="optionName != null and optionName != ''">
+				AND a.option_name = #{optionName}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="UserOptions">
+		SELECT 
+			<include refid="userOptionsColumns"/>
+		FROM user_options a
+		<include refid="userOptionsJoins"/>
+		<where>
+			
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO user_options(
+			id,
+			option_name,
+			option_value,
+			autoload,
+			group_name,
+			option_label
+		) VALUES (
+			#{id},
+			#{optionName},
+			#{optionValue},
+			#{autoload},
+			#{groupName},
+			#{optionLabel}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE user_options SET 	
+			option_name = #{optionName},
+			option_value = #{optionValue},
+			autoload = #{autoload},
+			group_name = #{groupName},
+			option_label = #{optionLabel}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		DELETE FROM user_options
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.user.dao.UserUsercenterLogDao">
+    
+	<sql id="userUsercenterLogColumns">
+		a.id AS "id",
+		a.user_name AS "userName",
+		a.status AS "status",
+		a.level AS "level",
+		a.center_name AS "centerName",
+		a.center_address AS "centerAddress",
+		a.addtime AS "addtime",
+		a.commt AS "commt",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="userUsercenterLogJoins">
+	</sql>
+    
+	<select id="get" resultType="UserUsercenterLog">
+		SELECT 
+			<include refid="userUsercenterLogColumns"/>
+		FROM user_usercenter_log a
+		<include refid="userUsercenterLogJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="UserUsercenterLog">
+		SELECT 
+			<include refid="userUsercenterLogColumns"/>
+		FROM user_usercenter_log a 
+		<include refid="userUsercenterLogJoins"/>
+		<where>
+			<if test="userName != null and userName != ''">
+				AND a.user_name =  #{userName}
+			</if>
+			<if test="centerName != null and centerName != ''">
+				AND a.center_name =  #{centerName}
+			</if>
+			<if test="status != null and status != ''">
+				AND a.status =  #{status}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<when test="orderBy !=null and orderBy != ''">
+				ORDER BY ${orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.id DESC
+			</otherwise>
+		</choose>
+		<if test="topLimit != null and topLimit != '' ">
+			limit 0,#{topLimit}
+		</if>
+	</select>
+
+	
+	<insert id="insert">
+		INSERT INTO user_usercenter_log(
+			id,
+			user_name,
+			status,
+			level,
+			center_name,
+			center_address,
+			addtime,
+			commt,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{userName},
+			#{status},
+			#{level},
+			#{centerName},
+			#{centerAddress},
+			#{addtime},
+			#{commt},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE user_usercenter_log SET 	
+			status = #{status},
+			commt = #{commt}
+		WHERE id = #{id}
+	</update>
+	
+
+	
+	<update id="delete">
+		delete from  user_usercenter_log
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

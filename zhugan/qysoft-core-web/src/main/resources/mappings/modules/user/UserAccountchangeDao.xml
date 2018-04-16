@@ -1,0 +1,305 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.user.dao.UserAccountchangeDao">
+    
+	<sql id="userAccountchangeColumns">
+		a.id AS "id",
+		a.user_name AS "userName",
+		a.change_money AS "changeMoney",
+		a.before_money AS "beforeMoney",
+		a.after_money AS "afterMoney",
+		a.commt AS "commt",
+		a.status AS "status",
+		a.ischeck AS "ischeck",
+		a.change_type AS "changeType",
+		a.money_type AS "moneyType",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		u.true_name AS "userUserinfo.trueName",
+		u.id  AS "userUserinfo.id"
+	</sql>
+	
+	<sql id="userAccountchangeJoins">
+	LEFT JOIN user_userinfo u ON u.user_name = a.user_name
+	</sql>
+    
+	<select id="get" resultType="UserAccountchange">
+		SELECT 
+			<include refid="userAccountchangeColumns"/>
+		FROM user_accountchange a
+		<include refid="userAccountchangeJoins"/>
+		WHERE a.id = #{id}
+	</select>
+
+	<select id="sumAddMoneyByMoneyType" resultType="BigDecimal">
+		SELECT
+		IFNULL(sum(change_money),0)
+		FROM user_accountchange
+		<where>
+			change_money &gt; 0
+			<if test="moneyType != null and moneyType != ''">
+				AND money_type = #{moneyType}
+			</if>
+			<if test="date != null and date != ''">
+				AND DATE_FORMAT(create_date, '%Y-%m-%d') = DATE_FORMAT(#{date}, '%Y-%m-%d')
+			</if>
+		</where>
+
+	</select>
+
+	<select id="sumMoneyByTypeAndDateGroupByName" resultType="UserAccountchange">
+		SELECT
+		user_name AS "userName",
+		IFNULL(sum(change_money),0) AS "changeMoney"
+		FROM user_accountchange
+		<where>
+				change_type = #{changeType}
+				AND money_type = #{moneyType}
+				AND DATE_FORMAT(create_date, '%Y-%m-%d') = DATE_FORMAT(#{createDate}, '%Y-%m-%d')
+		</where>
+		GROUP BY user_name
+
+	</select>
+
+	<select id="changeTypeSumMoney" resultType="BigDecimal">
+		SELECT
+		IFNULL(sum(change_money),0)
+		FROM user_accountchange a
+		<where>
+
+			<if test="changeType != null and changeType != ''">
+				AND a.change_type = #{changeType}
+			</if>
+			<if test="createDateBegin != null and createDateBegin != ''">
+				AND DATE_FORMAT(a.create_date, '%Y-%m-%d') &gt;= DATE_FORMAT(#{createDateBegin}, '%Y-%m-%d')
+			</if>
+			<if test="createDateEnd != null and createDateEnd != ''">
+				AND DATE_FORMAT(a.create_date, '%Y-%m-%d') &lt;= DATE_FORMAT(#{createDateEnd}, '%Y-%m-%d')
+			</if>
+		</where>
+
+	</select>
+
+	<select id="sumMoneyByChangeTypebydDay" resultType="BigDecimal">
+		SELECT
+		IFNULL(sum(change_money),0)
+		FROM user_accountchange
+		<where>
+			money_type = 1
+			<if test="userName != null and userName != ''">
+				AND user_name = #{userName}
+			</if>
+			<if test="changeType != null and changeType != ''">
+				AND change_type = #{changeType}
+			</if>
+			<if test="date != null and date != ''">
+				AND DATE_FORMAT(create_date, '%Y-%m-%d') = DATE_FORMAT(#{date}, '%Y-%m-%d')
+			</if>
+		</where>
+
+	</select>
+
+	<select id="sumAddMoneyByChangeType" resultType="BigDecimal">
+		SELECT
+		IFNULL(sum(change_money),0)
+		FROM user_accountchange
+		<where>
+			change_money &lt; 0
+			<if test="date != null and date != ''">
+				AND DATE_FORMAT(create_date, '%Y-%m') = DATE_FORMAT(#{date}, '%Y-%m')
+			</if>
+			<if test="userName != null and userName != ''">
+				AND user_name = #{userName}
+			</if>
+			<if test="moneyType != null and moneyType != ''">
+				AND money_type = #{moneyType}
+			</if>
+			<if test="changeType != null and changeType != ''">
+				AND change_type = #{changeType}
+			</if>
+		</where>
+
+	</select>
+
+	<select id="findList" resultType="UserAccountchange">
+		SELECT 
+			<include refid="userAccountchangeColumns"/>
+		FROM user_accountchange a 
+		<include refid="userAccountchangeJoins"/>
+		<where>
+
+			<if test="userName != null and userName != ''">
+				AND a.user_name = #{userName}
+			</if>
+			<if test="changeType != null and changeType != ''">
+				AND a.change_type = #{changeType}
+			</if>
+			<if test="moneyType != null and moneyType != ''">
+				AND a.money_type = #{moneyType}
+			</if>
+			<if test="moenyTypeEnd != null and moenyTypeEnd != ''">
+				AND a.money_type &lt;= #{moenyTypeEnd}
+			</if>
+			<if test="createDate != null and createDate != ''">
+				AND DATE_FORMAT(a.create_date, '%Y-%m-%d') = DATE_FORMAT(#{createDate}, '%Y-%m-%d')
+			</if>
+			<if test="createDateMonth != null and createDateMonth != ''">
+				AND DATE_FORMAT(a.create_date, '%Y-%m') = DATE_FORMAT(#{createDateMonth}, '%Y-%m')
+			</if>
+			<if test="createDateBegin != null and createDateBegin != ''">
+				AND DATE_FORMAT(a.create_date, '%Y-%m-%d') &gt;= DATE_FORMAT(#{createDateBegin}, '%Y-%m-%d')
+			</if>
+			<if test="createDateEnd != null and createDateEnd != ''">
+				AND DATE_FORMAT(a.create_date, '%Y-%m-%d') &lt;= DATE_FORMAT(#{createDateEnd}, '%Y-%m-%d')
+			</if>
+			<if test="changeMoneyBegin != null">
+				AND a.change_money &gt; #{changeMoneyBegin}
+			</if>
+			<if test="changeMoneyEnd != null ">
+				AND a.change_money &lt; #{changeMoneyEnd}
+			</if>
+			<if test="ischeck != null and ischeck != ''">
+				AND a.ischeck = #{ischeck}
+			</if>
+			<if test="isMonCheck != null and isMonCheck != ''">
+				AND a.isMonCheck = #{isMonCheck}
+			</if>
+
+			<if test="status != null and status != ''">
+				AND a.status = #{status}
+			</if>
+			<if test="userUserinfo != null and userUserinfo.parentListLike != null and userUserinfo.parentListLike != ''">
+				AND u.parent_list like  concat('%/',#{userUserinfo.parentListLike},'/%')
+			</if>
+			<if test="changeTypeArray != null">
+			AND a.change_type IN
+				<foreach collection="changeTypeArray" index="index" item="item" open="(" separator="," close=")">
+					#{item}
+				</foreach>
+			</if>
+
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<when test="orderBy !=null and orderBy != ''">
+				ORDER BY ${orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.id DESC
+			</otherwise>
+		</choose>
+		<if test="topLimit != null and topLimit != '' ">
+			limit 0,#{topLimit}
+		</if>
+	</select>
+	
+
+	<insert id="insert">
+		INSERT INTO user_accountchange(
+			id,
+			user_name,
+			change_money,
+			before_money,
+			after_money,
+			commt,
+			status,
+			ischeck,
+			change_type,
+			money_type,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{userName},
+			#{changeMoney},
+			#{beforeMoney},
+			#{afterMoney},
+			#{commt},
+			#{status},
+			#{ischeck},
+			#{changeType},
+			#{moneyType},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE user_accountchange SET 	
+			status = #{status},
+			ischeck = #{ischeck},
+			isMonCheck = #{isMonCheck},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		delete from  user_accountchange
+		WHERE id = #{id}
+	</update>
+
+	<select id="sumMoneyByType" parameterType="string" resultType="BigDecimal">
+		SELECT sum(change_money)  FROM `user_accountchange` a WHERE a.change_type=#{changeType} AND a.money_type=#{moneyType}
+	</select>
+
+	<select id="sumMoneyByTypeAndDate"  resultType="BigDecimal">
+		SELECT sum(change_money) FROM `user_accountchange` a WHERE a.user_name = #{userName} AND a.change_type=#{changeType} AND a.money_type=#{moneyType} AND DATE_FORMAT(a.create_date, '%Y-%m-%d') = DATE_FORMAT(#{date}, '%Y-%m-%d')
+	</select>
+
+	<select id="groupByChangeAndMoneyType" resultType="UserAccountchange">
+		SELECT
+		a.id AS "id",
+		a.user_name AS "userName",
+		sum(a.change_money) AS "changeMoney",
+		a.status AS "status",
+		a.change_type AS "changeType",
+		a.money_type AS "moneyType",
+		a.commt AS "commt",
+		a.create_date AS "createDate",
+		u.true_name AS "userUserinfo.trueName"
+		FROM user_accountchange a
+		LEFT JOIN user_userinfo u ON u.user_name = a.user_name
+		<where>
+			<if test="changeType != null and changeType != ''">
+				AND a.change_type = #{changeType}
+			</if>
+			<if test="moneyType != null and moneyType != ''">
+				AND a.money_type = #{moneyType}
+			</if>
+			<if test="userName != null and userName != ''">
+				AND a.user_name = #{userName}
+			</if>
+			<if test="createDateBegin != null and createDateBegin != ''">
+				AND DATE_FORMAT(a.create_date, '%Y-%m-%d') &gt;= DATE_FORMAT(#{createDateBegin}, '%Y-%m-%d')
+			</if>
+			<if test="createDateEnd != null and createDateEnd != ''">
+				AND DATE_FORMAT(a.create_date, '%Y-%m-%d') &lt;= DATE_FORMAT(#{createDateEnd}, '%Y-%m-%d')
+			</if>
+		</where>
+		GROUP BY a.user_name,DATE_FORMAT(a.create_date,'%Y-%m-%d')
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.create_date DESC
+			</otherwise>
+		</choose>
+	</select>
+</mapper>

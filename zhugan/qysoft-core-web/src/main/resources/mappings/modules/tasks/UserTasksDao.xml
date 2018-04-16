@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.tasks.dao.UserTasksDao">
+    
+	<sql id="userTasksColumns">
+		a.id AS "id",
+		a.name AS "name",
+		a.task_group AS "taskGroup",
+		a.description AS "description",
+		a.status AS "status",
+		a.create_date AS "createDate",
+		a.last_time AS "lastTime",
+		a.last_state AS "lastState",
+		a.schedule_cron AS "scheduleCron",
+		a.bean_name AS "beanName"
+	</sql>
+	
+	<sql id="userTasksJoins">
+	</sql>
+    
+	<select id="get" resultType="UserTasks">
+		SELECT 
+			<include refid="userTasksColumns"/>
+		FROM user_tasks a
+		<include refid="userTasksJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="UserTasks">
+		SELECT 
+
+			<include refid="userTasksColumns"/>
+		FROM user_tasks a
+		<include refid="userTasksJoins"/>
+		<where>
+			
+			<if test="name != null and name != ''">
+				AND a.name LIKE 
+					<if test="dbName == 'oracle'">'%'||#{name}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{name}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{name},'%')</if>
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="UserTasks">
+		SELECT 
+			<include refid="userTasksColumns"/>
+		FROM user_tasks a
+		<include refid="userTasksJoins"/>
+		<where>
+			
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO user_tasks(
+			id,
+			name,
+			task_group,
+			description,
+			status,
+			create_date,
+			last_time,
+			last_state,
+			schedule_cron,
+			bean_name
+		) VALUES (
+			#{id},
+			#{name},
+			#{taskGroup},
+			#{description},
+			#{status},
+			#{createDate},
+			#{lastTime},
+			#{lastState},
+			#{scheduleCron},
+			#{beanName}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE user_tasks SET 	
+			name = #{name},
+			task_group = #{taskGroup},
+			description = #{description},
+			status = #{status},
+			create_date = #{createDate},
+			last_state = #{lastState},
+			last_time = #{lastTime},
+			schedule_cron = #{scheduleCron},
+			bean_name = #{beanName}
+		WHERE id = #{id}
+	</update>
+
+	<update id="updateStatus">
+		UPDATE user_tasks SET
+		status = #{status}
+		WHERE id = #{id}
+	</update>
+
+	<update id="updateScheduleCron">
+		UPDATE user_tasks SET
+		schedule_cron = #{scheduleCron}
+		WHERE id = #{id}
+	</update>
+
+	<update id="updateLastTime">
+		UPDATE user_tasks SET
+		last_time = #{lastTime}
+		WHERE id = #{id}
+	</update>
+
+	<update id="updateLastState">
+		UPDATE user_tasks SET
+		last_state = #{lastState}
+		WHERE id = #{id}
+	</update>
+
+	<update id="delete">
+		DELETE FROM user_tasks
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

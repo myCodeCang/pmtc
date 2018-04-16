@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.user.dao.SysDataClearDao">
+   <delete id="clearUserAccountChangeTable">
+   		truncate table user_accountchange
+   </delete>
+   <delete id="clearUserChargeTable">
+   		truncate table user_charge
+   </delete>
+   <delete id="clearUserChargeBackRecordTable">
+   		truncate table user_charge_back_record
+   </delete>
+   <delete id="clearUserChargeLogTable">
+   		truncate table user_charge_log
+   </delete>
+   <delete id="clearUserLevelLogTable">
+   		truncate table user_level_log
+   </delete>
+   <delete id="clearUserMailMessageTable">
+   		truncate table user_mailmessage
+   </delete>
+   <delete id="clearUserReportTable">
+   		truncate table user_report
+   </delete>
+   <delete id="clearUserUserCenterLogTable">
+   		truncate table user_usercenter_log
+   </delete>
+   <delete id="clearUserUserInfoTable">
+   		delete from   user_userinfo where id != '1'
+   </delete>
+   <delete id="clearUserUserInfoBankTable">
+   		truncate table user_userinfo_bank
+   </delete>
+   <delete id="clearUserWithDrawTable">
+   		truncate table user_withdraw
+   </delete>
+    <delete id="clearSysLogTable">
+        truncate table sys_log
+    </delete>
+    <delete id="clearTransOrder">
+        truncate table trans_order
+    </delete>
+   <delete id="clearTransBuy">
+   		truncate table trans_buy
+   </delete>
+    <delete id="clearTransBuyDayTrend">
+        truncate table trans_buy_day_trend
+    </delete>
+    <delete id="clearTransBuyLog">
+        truncate table trans_buy_log
+    </delete>
+    <delete id="clearTransApply">
+        truncate table trans_apply
+    </delete>
+    <delete id="clearTransApplyCondition">
+        truncate table trans_apply
+    </delete>
+    <delete id="clearTransGoods">
+        truncate table trans_goods
+    </delete>
+    <delete id="clearTransGoodsGroup">
+        truncate table trans_goods_group
+    </delete>
+
+    <update id="updateUserinfoInit">
+
+        update user_userinfo set
+        level_no = '1',
+        user_no = '1',
+        money = 0,
+        score = 0,
+        money2=0,
+        money3=0,
+        money4=0,
+        money5=0,
+        money6=0,
+        main_performance = 0,
+        extend_performance = 0,
+        extend_performance_remainder = 0,
+        extend_performance_remainder = 0
+        where id = '1'
+    </update>
+</mapper>

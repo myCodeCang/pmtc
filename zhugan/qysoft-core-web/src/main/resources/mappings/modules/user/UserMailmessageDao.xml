@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.user.dao.UserMailmessageDao">
+    
+	<sql id="userMailmessageColumns">
+		a.id AS "id",
+		a.message_parent_id AS "messageParentId",
+		a.from_member_name AS "fromMemberName",
+		a.to_member_name AS "toMemberName",
+		a.message_title AS "messageTitle",
+		a.message_body AS "messageBody",
+		a.addtime AS "addtime",
+		a.message_type AS "messageType",
+		a.read_member_name AS "readMemberName",
+		a.sendbox_status AS "sendboxStatus",
+		a.receivebox_status AS "receiveboxStatus",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="userMailmessageJoins">
+	</sql>
+    
+	<select id="get" resultType="UserMailmessage">
+		SELECT 
+			<include refid="userMailmessageColumns"/>
+		FROM user_mailmessage a
+		<include refid="userMailmessageJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="UserMailmessage">
+		SELECT 
+			<include refid="userMailmessageColumns"/>
+		FROM user_mailmessage a  
+		<include refid="userMailmessageJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="fromMemberName != null and fromMemberName != ''">
+				AND a.from_member_name LIKE concat('%',#{fromMemberName},'%')
+			</if>
+			<if test="toMemberName != null and toMemberName != ''">
+				AND a.to_member_name LIKE concat('%',#{toMemberName},'%')
+			</if>
+			<if test="messageTitle != null and messageTitle != ''">
+				AND a.message_title LIKE concat('%',#{messageTitle},'%')
+			</if>
+			<if test="beginAddtime != null and endAddtime != null and beginAddtime != '' and endAddtime != ''">
+				AND a.addtime BETWEEN #{beginAddtime} AND #{endAddtime}
+			</if>
+			<if test="sendName != null and sendName != ''">
+				AND a.from_member_name = #{sendName}
+			</if>
+			<if test="receName != null and receName != ''">
+				AND a.to_member_name = #{receName}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.id DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="UserMailmessage">
+		SELECT 
+			<include refid="userMailmessageColumns"/>
+		FROM user_mailmessage a
+		<include refid="userMailmessageJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO user_mailmessage(
+			id,
+			message_parent_id,
+			from_member_name,
+			to_member_name,
+			message_title,
+			message_body,
+			addtime,
+			message_type,
+			read_member_name,
+			sendbox_status,
+			receivebox_status,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{messageParentId},
+			#{fromMemberName},
+			#{toMemberName},
+			#{messageTitle},
+			#{messageBody},
+			#{addtime},
+			#{messageType},
+			#{readMemberName},
+			#{sendboxStatus},
+			#{receiveboxStatus},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE user_mailmessage SET 	
+			message_parent_id = #{messageParentId},
+			from_member_name = #{fromMemberName},
+			to_member_name = #{toMemberName},
+			message_title = #{messageTitle},
+			message_body = #{messageBody},
+			addtime = #{addtime},
+			message_type = #{messageType},
+			read_member_name = #{readMemberName},
+			sendbox_status = #{sendboxStatus},
+			receivebox_status = #{receiveboxStatus},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE user_mailmessage SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

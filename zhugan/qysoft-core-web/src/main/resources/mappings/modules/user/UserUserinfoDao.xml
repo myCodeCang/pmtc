@@ -1,0 +1,707 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.user.dao.UserUserinfoDao">
+
+
+    <sql id="userUserinfoColumnNormal">
+
+		a.id AS "id",
+		a.user_name AS "userName",
+		a.mobile AS "mobile",
+		a.true_name AS "trueName",
+		a.user_nicename AS "userNicename",
+		a.user_pass AS "userPass",
+		a.bank_password AS "bankPassword",
+		a.zhuanqu_pass AS "zhuanquPass",
+		a.level_no AS "levelNo",
+		a.user_no AS "userNo",
+		a.office_id AS "officeId",
+		a.area_id AS "areaId",
+		a.user_level_id AS "userLevelId",
+		a.avatar AS "avatar",
+		a.id_card AS "idCard",
+		a.sex AS "sex",
+		a.user_email AS "userEmail",
+		a.last_login_ip AS "lastLoginIp",
+		a.last_login_time AS "lastLoginTime",
+		a.user_status AS "userStatus",
+		a.user_type AS "userType",
+		a.renzheng AS "renZheng",
+		a.money AS "money",
+		a.score AS "score",
+		a.coin AS "coin",
+		a.money2 AS "money2",
+		a.money3 AS "money3",
+		a.money4 AS "money4",
+		a.money5 AS "money5",
+		a.money6 AS "money6",
+		a.parent_name AS "parentName",
+		a.server_name AS "serverName",
+		a.walter_name AS "walterName",
+		a.parent_list AS "parentList",
+		a.is_check AS "isCheck",
+		a.weichat AS "weichat",
+		a.qq AS "qq",
+		a.openid AS "openid",
+		a.main_performance AS "mainPerformance",
+		a.extend_performance AS "extendPerformance",
+		a.position_site AS "positionSite",
+		a.is_usercenter AS "isUsercenter",
+		a.usercenter_level AS "usercenterLevel",
+		a.usercenter_address AS "usercenterAddress",
+		a.usercenter_addtime AS "usercenterAddtime",
+		a.is_see_child AS "isSeeChild",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		a.active_time AS "activeTime",
+		a.active_end_time AS "activeEndTime",
+		a.main_performance_remainder as "mainPerformanceRemainder",
+		a.extend_performance_remainder as "extendPerformanceRemainder",
+		a.active_status as "activeStatus",
+		a.is_shop as "isShop"
+	</sql>
+
+
+    <sql id="userUserinfoColumns">
+
+		a.id AS "id",
+		a.user_name AS "userName",
+		a.mobile AS "mobile",
+		a.true_name AS "trueName",
+		a.user_nicename AS "userNicename",
+		a.user_pass AS "userPass",
+		a.bank_password AS "bankPassword",
+		a.zhuanqu_pass AS "zhuanquPass",
+		a.level_no AS "levelNo",
+		a.user_no AS "userNo",
+		a.office_id AS "officeId",
+		a.area_id AS "areaId",
+		a.user_level_id AS "userLevelId",
+		a.avatar AS "avatar",
+		a.id_card AS "idCard",
+		a.sex AS "sex",
+		a.user_email AS "userEmail",
+		a.last_login_ip AS "lastLoginIp",
+		a.last_login_time AS "lastLoginTime",
+		a.user_status AS "userStatus",
+		a.user_type AS "userType",
+		a.renzheng AS "renZheng",
+		a.money AS "money",
+		a.score AS "score",
+		a.coin AS "coin",
+		a.money2 AS "money2",
+		a.money3 AS "money3",
+		a.money4 AS "money4",
+		a.money5 AS "money5",
+		a.money6 AS "money6",
+		a.parent_name AS "parentName",
+		a.server_name AS "serverName",
+		a.walter_name AS "walterName",
+		a.parent_list AS "parentList",
+		a.is_check AS "isCheck",
+		a.weichat AS "weichat",
+		a.qq AS "qq",
+		a.openid AS "openid",
+		a.main_performance AS "mainPerformance",
+		a.extend_performance AS "extendPerformance",
+		a.position_site AS "positionSite",
+		a.is_usercenter AS "isUsercenter",
+		a.usercenter_level AS "usercenterLevel",
+		a.usercenter_address AS "usercenterAddress",
+		a.usercenter_addtime AS "usercenterAddtime",
+		a.is_see_child AS "isSeeChild",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		u2.level_name As "userLevel.levelName" ,
+		u2.id as "userLevel.id",
+		o.name AS "office.name",
+		o.code AS "office.code",
+		a.active_time AS "activeTime",
+		a.active_end_time AS "activeEndTime",
+		a.main_performance_remainder as "mainPerformanceRemainder",
+		a.extend_performance_remainder as "extendPerformanceRemainder",
+		a.active_status as "activeStatus",
+		a.is_shop as "isShop"
+	</sql>
+
+
+    <sql id="userUserinfoJoins">
+		LEFT JOIN user_level u2 ON u2.level_code = a.user_level_id
+		LEFT JOIN sys_office o ON o.id = a.office_id
+		LEFT JOIN sys_user_wx wx ON wx.user_id = a.id
+	</sql>
+
+
+    <select id="getByNameLock" resultType="UserUserinfo">
+        SELECT
+        <include refid="userUserinfoColumnNormal"/>
+        FROM user_userinfo a
+        WHERE a.user_name = #{username}
+        for update
+    </select>
+
+
+    <select id="get" resultType="UserUserinfo">
+        SELECT
+        <include refid="userUserinfoColumns"/>
+        FROM user_userinfo a
+        <include refid="userUserinfoJoins"/>
+        WHERE a.id = #{id}
+    </select>
+
+    <select id="getByName" resultType="UserUserinfo">
+        SELECT
+        <include refid="userUserinfoColumns"/>
+        FROM user_userinfo a
+        <include refid="userUserinfoJoins"/>
+        WHERE a.user_name = #{username}
+    </select>
+
+
+    <select id="getByMobile" resultType="UserUserinfo">
+        SELECT
+        <include refid="userUserinfoColumns"/>
+        FROM user_userinfo a
+        <include refid="userUserinfoJoins"/>
+        WHERE a.mobile = #{mobile} AND a.mobile IS not NULL AND a.mobile != "" limit 1
+    </select>
+
+    <select id="getSumMoney2" resultType="BigDecimal">
+		SELECT
+		IFNULL(sum(money2),0)
+		from user_userinfo
+	</select>
+
+
+    <select id="findList" resultType="UserUserinfo">
+
+        SELECT
+        <include refid="userUserinfoColumns"/>
+        FROM user_userinfo a
+        <include refid="userUserinfoJoins"/>
+        <where>
+            <if test="userName != null and userName != ''">
+                AND a.user_name = #{userName}
+            </if>
+            <if test="mobile != null and mobile != ''">
+                AND a.mobile = #{mobile}
+            </if>
+            <if test="trueName != null and trueName != ''">
+                AND a.true_name = #{trueName}
+            </if>
+            <if test="isShop != null and isShop != ''">
+                AND a.is_shop = #{isShop}
+            </if>
+            <if test="parentName != null and parentName != ''">
+                AND a.parent_name = #{parentName}
+            </if>
+            <if test="walterName != null and walterName != ''">
+                AND a.walter_name = #{walterName}
+            </if>
+            <if test="serverName != null and serverName != ''">
+                AND a.server_name = #{serverName}
+            </if>
+            <if test="beginAddtime != null and beginAddtime != ''">
+                AND a.create_date &gt;= #{beginAddtime}
+            </if>
+            <if test="endAddtime != null and endAddtime != ''">
+                AND a.create_date &lt;= #{endAddtime}
+            </if>
+            <if test="usercenterLevel != null and usercenterLevel != ''">
+                AND a.usercenter_level = #{usercenterLevel}
+            </if>
+            <if test="isUsercenter != null and isUsercenter != ''">
+                AND a.is_usercenter = #{isUsercenter}
+            </if>
+            <if test="userLevelId != null and userLevelId != ''">
+                AND a.user_level_id = #{userLevelId}
+            </if>
+            <if test="levelIdBegin != null and levelIdBegin != ''">
+                AND a.user_level_id >= #{levelIdBegin}
+            </if>
+            <if test="parentListLike != null and parentListLike != ''">
+                AND a.parent_list like concat('%/',#{parentListLike},'/%')
+            </if>
+            <if test="officeId != null and officeId != ''">
+                AND a.office_id = #{officeId}
+            </if>
+            <if test="userStatus != null and userStatus != ''">
+                AND a.user_status = #{userStatus}
+            </if>
+            <if test="activeEndTimeBegin != null and activeEndTimeBegin != ''">
+                AND DATE_FORMAT(a.active_end_time, '%Y-%m-%d') &gt;= DATE_FORMAT(#{activeEndTimeBegin}, '%Y-%m-%d')
+            </if>
+            <if test="activeEndTimeEnd != null and activeEndTimeEnd != ''">
+                AND DATE_FORMAT(a.active_end_time, '%Y-%m-%d') &lt;= DATE_FORMAT(#{activeEndTimeBegin}, '%Y-%m-%d')
+            </if>
+            <if test="activeTime != null and activeTime != ''">
+                AND DATE_FORMAT(a.active_time, '%Y-%m-%d') = DATE_FORMAT(#{activeTime}, '%Y-%m-%d')
+            </if>
+            <if test="isCheck != null and isCheck != ''">
+                AND a.is_check = #{isCheck}
+            </if>
+            <if test="userNoBegin != null and userNoBegin != ''">
+                AND a.user_no &gt;= #{userNoBegin}
+            </if>
+            <if test="userNoEnd != null and userNoEnd != ''">
+                AND a.user_no &lt;= #{userNoEnd}
+            </if>
+            <if test="userNo != null and userNo != ''">
+                AND a.user_no = #{userNo}
+            </if>
+            <if test="levelNo != null and levelNo != ''">
+                AND a.level_no = #{levelNo}
+            </if>
+            <if test="activeStatus != null and activeStatus != ''">
+                AND a.active_status = #{activeStatus}
+            </if>
+            <if test="userType != null and userType != ''">
+                AND a.user_type >= #{userType}
+            </if>
+        </where>
+        <choose>
+            <when test="page !=null and page.orderBy != null and page.orderBy != ''">
+                ORDER BY ${page.orderBy}
+            </when>
+            <when test="orderBy !=null and orderBy != ''">
+                ORDER BY ${orderBy}
+            </when>
+            <otherwise>
+                ORDER BY a.id DESC
+            </otherwise>
+        </choose>
+        <if test="topLimit != null and topLimit != '' ">
+            limit 0,#{topLimit}
+        </if>
+    </select>
+
+
+    <select id="getUsersByParentName" resultType="UserUserinfo">
+        SELECT
+        <include refid="userUserinfoColumns"/>
+        FROM user_userinfo a
+        <include refid="userUserinfoJoins"/>
+        <where>
+            a.parent_name =#{parentName}
+        </where>
+        ORDER BY a.id asc
+    </select>
+
+    <select id="getUsersByWalterName" resultType="UserUserinfo">
+        SELECT
+        <include refid="userUserinfoColumns"/>
+        FROM user_userinfo a
+        <include refid="userUserinfoJoins"/>
+        <where>
+            a.walter_name =#{walterName}
+        </where>
+        ORDER BY a.id asc
+    </select>
+
+    <select id="findTeamByUserType" resultType="UserUserinfo">
+        SELECT
+        <include refid="userUserinfoColumns"/>
+        FROM user_userinfo a
+        <include refid="userUserinfoJoins"/>
+        <where>
+            a.user_type = #{userType}
+            AND a.parent_list like concat('%/',#{parentListLike},'/%')
+        </where>
+    </select>
+
+
+    <select id="getUsersByServerName" resultType="UserUserinfo">
+        SELECT
+        <include refid="userUserinfoColumns"/>
+        FROM user_userinfo a
+        <include refid="userUserinfoJoins"/>
+        <where>
+            a.server_name =#{serverName}
+        </where>
+        ORDER BY a.id asc
+    </select>
+
+    <insert id="insert">
+		INSERT INTO user_userinfo(
+			id,
+			user_name,
+			mobile,
+			true_name,
+			user_nicename,
+			user_pass,
+			bank_password,
+			zhuanqu_pass,
+			user_level_id,
+			avatar,
+			id_card,
+			sex,
+			user_email,
+			last_login_ip,
+			last_login_time,
+			user_status,
+			user_type,
+			renzheng,
+			parent_name,
+			server_name,
+			walter_name,
+			office_id,
+			area_id,
+			parent_list,
+			is_check,
+			weichat,
+			qq,
+			openid,
+			usercenter_address,
+			usercenter_addtime,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag,
+			level_no,
+			usercenter_level,
+			user_no,
+			active_time,
+			active_end_time,
+			position_site,
+			main_performance_remainder ,
+			extend_performance_remainder,
+			active_status,
+			money ,
+			score ,
+			coin,
+			money2 ,
+			money3 ,
+			money4 ,
+			money5 ,
+			money6,
+			is_shop
+		) VALUES (
+			#{id},
+			#{userName},
+			#{mobile},
+			#{trueName},
+			#{userNicename},
+			#{userPass},
+			#{bankPassword},
+			#{zhuanquPass},
+			#{userLevelId},
+			#{avatar},
+			#{idCard},
+			#{sex},
+			#{userEmail},
+			#{lastLoginIp},
+			#{lastLoginTime},
+			#{userStatus},
+			#{userType},
+			#{renZheng},
+			#{parentName},
+			#{serverName},
+			#{walterName},
+			#{officeId},
+			#{areaId},
+			#{parentList},
+			#{isCheck},
+			#{weichat},
+			#{qq},
+			#{openid},
+			#{usercenterAddress},
+			#{usercenterAddtime},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag},
+			#{levelNo},
+			#{usercenterLevel},
+			#{userNo},
+			#{activeTime},
+			#{activeEndTime},
+			#{positionSite},
+			#{mainPerformanceRemainder},
+			#{extendPerformanceRemainder},
+			#{activeStatus},
+			#{money},
+			#{score},
+			#{coin},
+			#{money2},
+			#{money3},
+			#{money4},
+			#{money5},
+			#{money6},
+			#{isShop}
+		)
+	</insert>
+
+	<update id="setUserAvatar">
+		UPDATE user_userinfo SET
+		avatar = #{avatar}
+		WHERE id = #{id}
+	</update>
+
+    <update id="update">
+        UPDATE user_userinfo SET
+        true_name = #{trueName},
+        mobile = #{mobile},
+        user_nicename = #{userNicename},
+        avatar = #{avatar},
+        id_card = #{idCard},
+        office_id = #{officeId},
+        area_id = #{areaId},
+        <if test="userPass != null and userPass != ''">
+            user_pass = #{userPass},
+        </if>
+        <if test="bankPassword != null and bankPassword != ''">
+            bank_password = #{bankPassword},
+        </if>
+        <if test="zhuanquPass != null and zhuanquPass != ''">
+            zhuanqu_pass = #{zhuanquPass},
+        </if>
+        sex = #{sex},
+        renzheng = #{renZheng},
+        user_email = #{userEmail},
+        last_login_ip = #{lastLoginIp},
+        last_login_time = #{lastLoginTime},
+        weichat = #{weichat},
+        qq = #{qq},
+        update_by = #{updateBy.id},
+        update_date = #{updateDate},
+        remarks = #{remarks},
+        user_level_id = #{userLevelId},
+        active_time = #{activeTime},
+        active_end_time = #{activeEndTime},
+        is_check = #{isCheck},
+        active_status= #{activeStatus }
+        WHERE id = #{id}
+    </update>
+
+    <update id="setUserCenter">
+		UPDATE user_userinfo SET 
+			is_usercenter = #{isUsercenter},
+			usercenter_level = #{usercenterLevel},
+			usercenter_address = #{usercenterAddress},
+			usercenter_addtime = #{usercenterAddtime}
+		WHERE user_name = #{userName}
+	</update>
+
+    <update id="delete">
+		delete from user_userinfo
+		WHERE id = #{id}
+	</update>
+
+
+    <update id="updateUserState">
+		UPDATE user_userinfo SET
+		user_status = #{state}
+		WHERE id = #{id}
+	</update>
+
+    <update id="updateIsCheck">
+		UPDATE user_userinfo SET
+		is_check = #{isCheck}
+		WHERE user_name = #{userName}
+	</update>
+
+    <update id="updateUserNiceName">
+		UPDATE user_userinfo SET
+		user_nicename = #{nickName}
+		WHERE user_name = #{userName}
+	</update>
+
+    <update id="updateUserRenzheng">
+		UPDATE user_userinfo SET
+		renzheng = #{renZheng}
+		WHERE user_name = #{userName}
+	</update>
+
+
+    <update id="updateActiveTime">
+		UPDATE user_userinfo SET
+		active_time = #{activeTime}
+		WHERE id = #{id}
+	</update>
+
+    <update id="updateUserType">
+		UPDATE user_userinfo SET
+		user_type = #{userType}
+		WHERE user_name = #{userName}
+	</update>
+
+
+    <update id="updateUseroffice">
+		UPDATE user_userinfo SET
+		office_id = #{officeId}
+		WHERE  parent_list like  concat('%/',#{parentListLike},'/%')
+	</update>
+
+
+    <update id="updateUserMoney">
+		UPDATE user_userinfo SET
+		money = money + #{money}
+		WHERE user_name = #{name}
+	</update>
+
+    <update id="updateUserLevelId">
+		UPDATE user_userinfo SET
+		user_level_id = #{userLevelId}
+		WHERE id = #{id}
+	</update>
+
+    <update id="updateUserMobile">
+		UPDATE user_userinfo SET
+		mobile = #{mobile}
+		WHERE user_name = #{name}
+	</update>
+
+    <update id="updateUserPwd">
+		UPDATE user_userinfo SET
+		user_pass = #{newpassword}
+		WHERE user_name = #{name}
+	</update>
+
+    <update id="updateUserPaypass">
+		UPDATE user_userinfo SET
+		bank_password = #{newpaypass}
+		WHERE user_name = #{name}
+	</update>
+
+    <update id="updateUserZhuanqupass">
+		UPDATE user_userinfo SET
+		zhuanqu_pass = #{newZhuanquPass}
+		WHERE user_name = #{userName}
+	</update>
+
+    <update id="updateUserScore">
+		UPDATE user_userinfo SET
+		score = score + #{money}
+		WHERE user_name = #{name}
+	</update>
+    <update id="updateUserCoin">
+		UPDATE user_userinfo SET
+		coin = coin + #{coin}
+		WHERE user_name = #{name}
+	</update>
+
+    <update id="updateIsShop">
+		UPDATE user_userinfo SET
+		is_shop = #{isShop}
+		WHERE user_name = #{userName}
+	</update>
+    <update id="updateActiveStatus">
+		UPDATE user_userinfo SET
+		active_status = #{activeStatus}
+		WHERE user_name = #{userName}
+	</update>
+
+    <update id="updateIsProxy">
+		UPDATE user_userinfo SET
+		active_status = #{activeStatus},
+		main_performance = #{mainPerformance},
+		user_level_id = #{userLevelId}
+		WHERE user_name = #{userName}
+	</update>
+
+    <update id="updateUserOtherMoney">
+        UPDATE user_userinfo SET
+        <choose>
+            <when test="moneyType==3">
+                money2 = money2 + #{money}
+            </when>
+            <when test="moneyType==4">
+                money3 = money3 + #{money}
+            </when>
+            <when test="moneyType==5">
+                money4 = money4 + #{money}
+            </when>
+            <when test="moneyType==6">
+                money5 = money5 + #{money}
+            </when>
+            <when test="moneyType==7">
+                money6 = money6 + #{money}
+            </when>
+        </choose>
+        WHERE user_name = #{name}
+    </update>
+
+    <update id="updateUserMainPerformance">
+		UPDATE user_userinfo SET
+		main_performance = main_performance + #{performance}
+		WHERE user_name = #{userName}
+	</update>
+
+
+    <update id="updateUserExtendPerformance">
+		UPDATE user_userinfo SET
+		extend_performance = extend_performance + #{performance}
+		WHERE user_name = #{userName}
+	</update>
+
+
+    <update id="updateUserMainRemainderPerformance">
+		UPDATE user_userinfo SET
+		main_performance_remainder =  #{performance}
+		WHERE user_name = #{userName}
+	</update>
+
+
+    <update id="updateUserExtendRemainderPerformance">
+		UPDATE user_userinfo SET
+		extend_performance_remainder = #{performance}
+		WHERE user_name = #{userName}
+	</update>
+
+
+    <select id="getMaxUserNo" resultType="Integer">
+		SELECT
+		max(user_no)
+		FROM user_userinfo a
+	</select>
+
+
+    <select id="getTeamLevelMoney" resultType="BigDecimal">
+        SELECT
+        IFNULL(sum(b.money),0) from user_userinfo a
+        left join user_level b on a.user_level_id = b.level_code
+        WHERE
+        a.parent_list like concat('%/',#{parentListLike},'/%')
+        <if test="levelNo != null and levelNo != ''">
+            and a.level_no &lt;= #{levelNo}
+        </if>
+        <if test="activeTime != null and activeTime != ''">
+            and DATE_FORMAT(a.active_time, '%Y-%m-%d') = DATE_FORMAT(#{activeTime}, '%Y-%m-%d')
+        </if>
+
+    </select>
+
+    <!-- 更新登录信息，如登录IP、登录时间 -->
+    <update id="updateLoginInfo">
+		UPDATE user_userinfo SET
+		last_login_ip = #{lastLoginIp},
+		last_login_time = #{lastLoginTime}
+		WHERE id = #{id}
+	</update>
+
+    <select id="sumUserMoney2" parameterType="string" resultType="BigDecimal">
+        select sum(a.money2) money2 from user_userinfo a  WHERE a.parent_list LIKE "%"#{likeNameId}"%"
+    </select>
+
+    <select id="sumUserEveryMoney" resultType="UseruserInfo">
+        select sum(a.money) money,sum(a.money2) money2,sum(a.money3) money3,sum(a.money4) money4,sum(a.money5) money5 from user_userinfo a
+    </select>
+
+    <update id="updateShopId">
+		UPDATE user_userinfo SET
+		shop_id = #{shopId}
+		WHERE user_name = #{userName}
+	</update>
+</mapper>

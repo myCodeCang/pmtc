@@ -1,0 +1,108 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<wsdl:definitions name="WSTradeQuery" targetNamespace="http://payat.ips.com.cn/WebService/TradeQuery"
+                  xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+                  xmlns:tns="http://payat.ips.com.cn/WebService/TradeQuery"
+                  xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <wsdl:message name="getTradeList">
+    <wsdl:part name="getTradeList" type="xsd:string">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getIssuedByBillNo">
+    <wsdl:part name="getIssuedByBillNo" type="xsd:string">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="posQueryResponse">
+    <wsdl:part name="posQueryResult" type="xsd:string">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getIssuedRetrunInfoResponse">
+    <wsdl:part name="getIssuedRetrunInfoResult" type="xsd:string">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getIssuedByBillNoResponse">
+    <wsdl:part name="getIssuedByBillNoResult" type="xsd:string">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getTradeListResponse">
+    <wsdl:part name="getTradeListResult" type="xsd:string">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getIssuedRetrunInfo">
+    <wsdl:part name="getIssuedRetrunInfo" type="xsd:string">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="posQuery">
+    <wsdl:part name="posQuery" type="xsd:string">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:portType name="TradeQueryService">
+    <wsdl:operation name="getIssuedByBillNo">
+      <wsdl:input message="tns:getIssuedByBillNo" name="getIssuedByBillNo">
+    </wsdl:input>
+      <wsdl:output message="tns:getIssuedByBillNoResponse" name="getIssuedByBillNoResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getTradeList">
+      <wsdl:input message="tns:getTradeList" name="getTradeList">
+    </wsdl:input>
+      <wsdl:output message="tns:getTradeListResponse" name="getTradeListResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getIssuedRetrunInfo">
+      <wsdl:input message="tns:getIssuedRetrunInfo" name="getIssuedRetrunInfo">
+    </wsdl:input>
+      <wsdl:output message="tns:getIssuedRetrunInfoResponse" name="getIssuedRetrunInfoResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="posQuery">
+      <wsdl:input message="tns:posQuery" name="posQuery">
+    </wsdl:input>
+      <wsdl:output message="tns:posQueryResponse" name="posQueryResponse">
+    </wsdl:output>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="WSTradeQuerySoapBinding" type="tns:TradeQueryService">
+    <soap:binding style="rpc" transport="http://schemas.xmlsoap.org/soap/http"/>
+    <wsdl:operation name="getIssuedByBillNo">
+      <soap:operation soapAction="http://payat.ips.com.cn/WebService/TradeQuery/getIssuedByBillNo" style="rpc"/>
+      <wsdl:input name="getIssuedByBillNo">
+        <soap:body namespace="http://payat.ips.com.cn/WebService/TradeQuery" use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="getIssuedByBillNoResponse">
+        <soap:body namespace="http://payat.ips.com.cn/WebService/TradeQuery" use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getTradeList">
+      <soap:operation soapAction="http://payat.ips.com.cn/WebService/TradeQuery/getTradeList" style="rpc"/>
+      <wsdl:input name="getTradeList">
+        <soap:body namespace="http://payat.ips.com.cn/WebService/TradeQuery" use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="getTradeListResponse">
+        <soap:body namespace="http://payat.ips.com.cn/WebService/TradeQuery" use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getIssuedRetrunInfo">
+      <soap:operation soapAction="http://payat.ips.com.cn/WebService/TradeQuery/getIssuedRetrunInfo" style="rpc"/>
+      <wsdl:input name="getIssuedRetrunInfo">
+        <soap:body namespace="http://payat.ips.com.cn/WebService/TradeQuery" use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="getIssuedRetrunInfoResponse">
+        <soap:body namespace="http://payat.ips.com.cn/WebService/TradeQuery" use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="posQuery">
+      <soap:operation soapAction="http://payat.ips.com.cn/WebService/TradeQuery/posQuery" style="rpc"/>
+      <wsdl:input name="posQuery">
+        <soap:body namespace="http://payat.ips.com.cn/WebService/TradeQuery" use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="posQueryResponse">
+        <soap:body namespace="http://payat.ips.com.cn/WebService/TradeQuery" use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="WSTradeQuery">
+    <wsdl:port binding="tns:WSTradeQuerySoapBinding" name="WSTradeQuerySoap">
+      <soap:address location="http://query.ips.com.cn/psfp-wsquery/services/trade"/>
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

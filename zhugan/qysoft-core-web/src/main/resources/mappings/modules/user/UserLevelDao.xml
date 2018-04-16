@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.user.dao.UserLevelDao">
+    
+	<sql id="userLevelColumns">
+		a.id AS "id",
+		a.level_name AS "levelName",
+		a.level_code AS "levelCode",
+		a.money AS "money",
+		a.static_money AS "staticMoney",
+		a.static_money_high AS "staticMoneyHigh",
+		a.performance AS "performance",
+		a.sort AS "sort",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.amount_per AS "amountPer",
+		a.amount_cap AS "amountCap",
+		a.static_money_day AS "staticMoneyDay",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="userLevelJoins">
+	</sql>
+    
+	<select id="get" resultType="UserLevel">
+		SELECT 
+			<include refid="userLevelColumns"/>
+		FROM user_level a
+		<include refid="userLevelJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findByLevalCode" resultType="UserLevel">
+		SELECT 
+			<include refid="userLevelColumns"/>
+		FROM user_level a
+		<include refid="userLevelJoins"/>
+		WHERE a.level_code = #{levelCode}
+	</select>
+	
+	<select id="findList" resultType="UserLevel">
+		SELECT
+			<include refid="userLevelColumns"/>
+		FROM user_level a 
+		<include refid="userLevelJoins"/>
+		<where>
+			1 =1
+			<if test="levelName != null and levelName != ''">
+				AND a.level_name = #{levelName}
+			</if>
+			<if test="levelCode != null and levelCode != ''">
+				AND a.level_code = #{levelCode}
+			</if>
+			<if test="levelCodeBegin != null and levelCodeBegin != ''">
+				AND a.level_code &gt;= #{levelCodeBegin}
+			</if>
+			<if test="levelCodeEnd != null and levelCodeEnd != ''">
+				AND a.level_code &lt;= #{levelCodeEnd}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<when test="orderBy !=null and orderBy != ''">
+				ORDER BY ${orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.level_code asc
+			</otherwise>
+		</choose>
+		<if test="topLimit != null and topLimit != '' ">
+			limit 0,#{topLimit}
+		</if>
+	</select>
+
+	<insert id="insert">
+		INSERT INTO user_level(
+			id,
+			level_name,
+			level_code,
+			money,
+			static_money,
+			static_money_high,
+			performance,
+			sort,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			amount_per,
+			amount_cap,
+			static_money_day,
+			del_flag
+		) VALUES (
+			#{id},
+			#{levelName},
+			#{levelCode},
+			#{money},
+			#{staticMoney},
+			#{staticMoneyHigh},
+			#{performance},
+			#{sort},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{amountPer},
+			#{amountCap},
+			#{staticMoneyDay},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE user_level SET 	
+			level_name = #{levelName},
+			level_code = #{levelCode},
+			money = #{money},
+			static_money = #{staticMoney},
+			static_money_high = #{staticMoneyHigh},
+			performance = #{performance},
+			sort = #{sort},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			amount_per = #{amountPer},
+			amount_cap = #{amountCap},
+			static_money_day = #{staticMoneyDay},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		delete from  user_level
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

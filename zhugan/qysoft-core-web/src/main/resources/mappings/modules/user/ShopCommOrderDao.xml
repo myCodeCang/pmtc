@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.user.dao.ShopCommOrderDao">
+    
+	<sql id="shopCommOrderColumns">
+		a.id AS "id",
+		a.user_name AS "userName",
+		a.change_money AS "changeMoney",
+		a.commt AS "commt",
+		a.status AS "status",
+		a.ischeck AS "ischeck",
+		a.order_id AS "orderId",
+		a.shop_id AS "shopId",
+		a.money_type AS "moneyType",
+		a.score AS "score",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="shopCommOrderJoins">
+	</sql>
+    
+	<select id="get" resultType="ShopCommOrder">
+		SELECT 
+			<include refid="shopCommOrderColumns"/>
+		FROM shop_comm_order a
+		<include refid="shopCommOrderJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="ShopCommOrder">
+		SELECT 
+
+			<include refid="shopCommOrderColumns"/>
+		FROM shop_comm_order a
+		<include refid="shopCommOrderJoins"/>
+		<where>
+		  <if test="ischeck != null and ischeck != ''">
+			  a.ischeck = #{ischeck}
+		  </if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="ShopCommOrder">
+		SELECT 
+			<include refid="shopCommOrderColumns"/>
+		FROM shop_comm_order a
+		<include refid="shopCommOrderJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO shop_comm_order(
+			id,
+			user_name,
+			change_money,
+			commt,
+			status,
+			ischeck,
+			order_id,
+			shop_id,
+			money_type,
+			score,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{userName},
+			#{changeMoney},
+			#{commt},
+			#{status},
+			#{ischeck},
+			#{orderId},
+			#{shopId},
+			#{moneyType},
+			#{score},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE shop_comm_order SET 	
+			user_name = #{userName},
+			change_money = #{changeMoney},
+			commt = #{commt},
+			status = #{status},
+			ischeck = #{ischeck},
+			order_id = #{orderId},
+			shop_id = #{shopId},
+			money_type = #{moneyType},
+			score = #{score},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE shop_comm_order SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

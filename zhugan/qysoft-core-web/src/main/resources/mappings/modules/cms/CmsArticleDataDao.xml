@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.cms.dao.CmsArticleDataDao">
+    
+	<sql id="cmsArticleDataColumns">
+		a.id AS "id",
+		a.content AS "content",
+		a.copyfrom AS "copyfrom",
+		a.relation AS "relation",
+		a.allow_comment AS "allowComment"
+	</sql>
+	
+	<sql id="cmsArticleDataJoins">
+	</sql>
+    
+	<select id="get" resultType="CmsArticleData">
+		SELECT 
+			<include refid="cmsArticleDataColumns"/>
+		FROM cms_article_data a
+		<include refid="cmsArticleDataJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="CmsArticleData">
+		SELECT 
+
+			<include refid="cmsArticleDataColumns"/>
+		FROM cms_article_data a
+		<include refid="cmsArticleDataJoins"/>
+		<where>
+			
+			<if test="id != null and id != ''">
+				AND a.id = #{id}
+			</if>
+			<if test="content != null and content != ''">
+				AND a.content LIKE 
+					<if test="dbName == 'oracle'">'%'||#{content}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{content}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{content},'%')</if>
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="CmsArticleData">
+		SELECT 
+			<include refid="cmsArticleDataColumns"/>
+		FROM cms_article_data a
+		<include refid="cmsArticleDataJoins"/>
+		<where>
+			
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO cms_article_data(
+			id,
+			content,
+			copyfrom,
+			relation,
+			allow_comment
+		) VALUES (
+			#{id},
+			#{content},
+			#{copyfrom},
+			#{relation},
+			#{allowComment}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE cms_article_data SET 	
+			content = #{content},
+			copyfrom = #{copyfrom},
+			relation = #{relation},
+			allow_comment = #{allowComment}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		DELETE FROM cms_article_data
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

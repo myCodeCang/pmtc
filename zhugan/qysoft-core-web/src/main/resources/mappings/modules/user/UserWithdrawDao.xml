@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.user.dao.UserWithdrawDao">
+    
+	<sql id="userWithdrawColumns">
+		a.id AS "id",
+		a.user_name AS "userName",
+		a.recordcode AS "recordcode",
+		a.change_money AS "changeMoney",
+		a.before_money AS "beforeMoney",
+		a.after_money AS "afterMoney",
+		a.addtime AS "addtime",
+		a.commt AS "commt",
+		a.status AS "status",
+		a.ischeck AS "ischeck",
+		a.remittance_status AS "remittanceStatus",
+		a.batch_no  AS "BatchNo",
+		a.change_type AS "changeType",
+		a.user_bank_name AS "userBankName",
+		a.user_bank_num AS "userBankNum",
+		a.user_bank_code AS "userBankCode",
+		a.provinces AS "provinces",
+ 		a.citys AS "citys",
+		a.area AS "area",
+		a.user_bank_address AS "userBankAddress",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		b.name AS  "bankCodeName",
+		c.true_name AS  "trueName"
+	</sql>
+	
+	<sql id="userWithdrawJoins">
+		left join user_bank_common b on b.bank_code = a.user_bank_code
+		left join user_userinfo c on  c.user_name = a.user_name
+	</sql>
+    
+	<select id="get" resultType="UserWithdraw">
+		SELECT 
+			<include refid="userWithdrawColumns"/>
+		FROM user_withdraw a
+		<include refid="userWithdrawJoins"/>
+		WHERE a.id = #{id}
+	</select>
+
+	<select id="findList" resultType="UserWithdraw">
+		SELECT 
+			<include refid="userWithdrawColumns"/>
+		FROM user_withdraw a
+		<include refid="userWithdrawJoins"/>
+		<where>
+			<if test="userName != null and userName != ''">
+				AND a.user_name =  #{userName}
+			</if>
+			<if test="limitDate != null and limitDate != ''">
+				AND DATE_FORMAT(a.create_date, '%Y-%m-%d') = DATE_FORMAT(#{limitDate}, '%Y-%m-%d')
+			</if>
+			<if test="createDateBegin != null and createDateBegin != ''">
+				AND a.create_date &gt;= #{createDateBegin}
+			</if>
+			<if test="createDateEnd != null and createDateEnd != ''">
+				AND a.create_date &lt;= #{createDateEnd}
+			</if>
+			<if test="status != null and status != ''">
+				AND a.status =  #{status}
+			</if>
+			<if test="recordcode != null and recordcode != ''">
+				AND a.recordcode =  #{recordcode}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<when test="orderBy !=null and orderBy != ''">
+				ORDER BY ${orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.id DESC
+			</otherwise>
+		</choose>
+		<if test="topLimit != null and topLimit != '' ">
+			limit 0,#{topLimit}
+		</if>
+	</select>
+
+	
+	<insert id="insert">
+		INSERT INTO user_withdraw(
+			id,
+			user_name,
+			recordcode,
+			change_money,
+			before_money,
+			after_money,
+			addtime,
+			commt,
+			status,
+			ischeck,
+			change_type,
+			user_bank_name,
+			user_bank_num,
+			user_bank_code,
+			provinces,
+			citys,
+			area,
+			user_bank_address,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{userName},
+			#{recordcode},
+			#{changeMoney},
+			#{beforeMoney},
+			#{afterMoney},
+			#{addtime},
+			#{commt},
+			#{status},
+			#{ischeck},
+			#{changeType},
+			#{userBankName},
+			#{userBankNum},
+			#{userBankCode},
+			#{provinces},
+			#{citys},
+			#{area},
+			#{userBankAddress},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+
+	<update id="updateStatus">
+		UPDATE user_withdraw SET
+		status = #{status},
+		update_date = #{updateDate},
+		commt = #{commt}
+		WHERE id = #{id}
+	</update>
+
+	<update id="updateRemittanceStatus">
+		UPDATE user_withdraw SET
+		remittance_status = #{remittanceStatus},
+		batch_no = #{BatchNo},
+		update_date = #{updateDate}
+		WHERE id = #{id}
+	</update>
+</mapper>

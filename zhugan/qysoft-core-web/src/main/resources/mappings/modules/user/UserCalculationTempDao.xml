@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.user.dao.UserCalculationTempDao">
+    
+	<sql id="userCalculationTempColumns">
+		a.id AS "id",
+		a.user_name AS "userName",
+		a.dividend_one AS "dividendOne",
+		a.dividend_two AS "dividendTwo",
+		a.dividend_three AS "dividendThree",
+		a.dividend_four AS "dividendFour",
+		a.dividend_five AS "dividendFive",
+		a.dividend_six AS "dividendSix",
+		a.dividend_seven AS "dividendSeven",
+		a.dividend_eight AS "dividendEight",
+		a.dividend_nine AS "dividendNine",
+		a.dividend_ten AS "dividendTen",
+		a.is_check AS "isCheck",
+		a.status AS "status",
+		a.type AS "type",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="userCalculationTempJoins">
+	</sql>
+    
+	<select id="get" resultType="UserCalculationTemp">
+		SELECT 
+			<include refid="userCalculationTempColumns"/>
+		FROM user_calculation_temp a
+		<include refid="userCalculationTempJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="UserCalculationTemp">
+		SELECT 
+
+			<include refid="userCalculationTempColumns"/>
+		FROM user_calculation_temp a
+		<include refid="userCalculationTempJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="userName != null and userName != ''">
+				AND a.user_name = #{userName}
+			</if>
+			<if test="createDate != null and createDate != ''">
+				AND a.create_date = #{createDate}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="UserCalculationTemp">
+		SELECT 
+			<include refid="userCalculationTempColumns"/>
+		FROM user_calculation_temp a
+		<include refid="userCalculationTempJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO user_calculation_temp(
+			id,
+			user_name,
+			dividend_one,
+			dividend_two,
+			dividend_three,
+			dividend_four,
+			dividend_five,
+			dividend_six,
+			dividend_seven,
+			dividend_eight,
+			dividend_nine,
+			dividend_ten,
+			is_check,
+			status,
+			type,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{userName},
+			#{dividendOne},
+			#{dividendTwo},
+			#{dividendThree},
+			#{dividendFour},
+			#{dividendFive},
+			#{dividendSix},
+			#{dividendSeven},
+			#{dividendEight},
+			#{dividendNine},
+			#{dividendTen},
+			#{isCheck},
+			#{status},
+			#{type},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE user_calculation_temp SET 	
+			user_name = #{userName},
+			dividend_one = #{dividendOne},
+			dividend_two = #{dividendTwo},
+			dividend_three = #{dividendThree},
+			dividend_four = #{dividendFour},
+			dividend_five = #{dividendFive},
+			dividend_six = #{dividendSix},
+			dividend_seven = #{dividendSeven},
+			dividend_eight = #{dividendEight},
+			dividend_nine = #{dividendNine},
+			dividend_ten = #{dividendTen},
+			is_check = #{isCheck},
+			status = #{status},
+			type = #{type},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+
+	<update id="updateCalculationTempByType">
+		UPDATE user_calculation_temp SET
+		<choose>
+			<when test="reportType==1">
+				dividend_one = dividend_one + #{money}
+			</when>
+			<when test="reportType==2">
+
+				dividend_two = dividend_two + #{money}
+			</when>
+			<when test="reportType==3">
+				dividend_three = dividend_three + #{money}
+			</when>
+			<when test="reportType==4">
+				dividend_four = dividend_four + #{money}
+			</when>
+			<when test="reportType==5">
+				dividend_five = dividend_five + #{money}
+			</when>
+			<when test="reportType==6">
+				dividend_six = dividend_six + #{money}
+			</when>
+			<when test="reportType==7">
+				dividend_seven = dividend_seven + #{money}
+			</when>
+			<when test="reportType==8">
+				dividend_eight = dividend_eight + #{money}
+			</when>
+			<when test="reportType==9">
+				dividend_nine = dividend_nine + #{money}
+			</when>
+		</choose>
+		WHERE user_name = #{userName}
+	</update>
+	
+	<update id="delete">
+		UPDATE user_calculation_temp SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+
+	<delete id="clearUserCalculationTemp">
+		truncate table user_calculation_temp
+	</delete>
+	
+</mapper>

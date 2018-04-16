@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.user.dao.UserLevelLogDao">
+    
+	<sql id="userLevelLogColumns">
+		a.id AS "id",
+		a.user_name AS "userName",
+		a.update_type AS "updateType",
+		a.commt AS "commt",
+		a.create_date AS "createDate",
+		a.update_date AS "updateDate",
+		a.del_flag AS "delFlag",
+		a.old_level AS "oldLevel" ,
+		a.new_level AS "newLevel",
+		b.level_name AS "oldLevelName" ,
+		e.level_name AS "newLevelName",
+		c.true_name AS "trueName",
+		a.ischeck AS "ischeck",
+		a.performance AS "performance"
+	</sql>
+	
+	<sql id="userLevelLogJoins">
+		LEFT JOIN user_level b ON a.old_level = b.level_code
+		LEFT JOIN user_level e ON a.new_level = e.level_code
+		LEFT JOIN user_userinfo c ON a.user_name = c.user_name
+	</sql>
+    
+	<select id="get" resultType="UserLevelLog">
+		SELECT 
+			<include refid="userLevelLogColumns"/>
+		FROM user_level_log a
+		<include refid="userLevelLogJoins"/>
+		WHERE a.id = #{id}
+	</select>
+
+	<select id="contPerformance" resultType="UserLevelLog">
+		SELECT
+		sum(a.performance) AS "performance"
+		FROM user_level_log a
+		<where>
+			<if test="createDateBegin != null and createDateBegin != ''">
+				AND  date_format(a.create_date, '%y-%m-%d') &gt;= date_format(#{createDateBegin}, '%y-%m-%d')
+			</if>
+			<if test="createDateEnd != null and createDateEnd != ''">
+				AND date_format(a.create_date, '%y-%m-%d') &lt;= date_format(#{createDateEnd}, '%y-%m-%d')
+			</if>
+		</where>
+	</select>
+	
+	<select id="findList" resultType="UserLevelLog">
+
+		SELECT
+			<include refid="userLevelLogColumns"/>
+		FROM user_level_log a
+		<include refid="userLevelLogJoins"/>
+		<where>
+			<if test="userName != null and userName != ''">
+				AND a.user_name = #{userName}
+			</if>
+			<if test="createDateBegin != null and createDateBegin != ''">
+				AND a.create_date &gt;= #{createDateBegin}
+			</if>
+			<if test="createDateEnd != null and createDateEnd != ''">
+				AND a.create_date &lt;= #{createDateEnd}
+			</if>
+			<if test="trueName != null and trueName != ''">
+				AND c.true_name = #{trueName}
+			</if>
+			<if test="ischeck != null and ischeck != ''">
+				AND a.ischeck = #{ischeck}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<when test="orderBy !=null and orderBy != ''">
+				ORDER BY ${orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.id DESC
+			</otherwise>
+		</choose>
+		<if test="topLimit != null and topLimit != '' ">
+			limit 0,#{topLimit}
+		</if>
+	</select>
+	<insert id="insert">
+		INSERT INTO user_level_log(
+		id,
+		user_name ,
+		update_type ,
+		commt,
+		create_date ,
+		update_date,
+		old_level,
+		new_level,
+		ischeck,
+		performance
+
+		) VALUES (
+		#{id},
+		#{userName},
+		#{updateType},
+		#{commt},
+		#{createDate},
+		#{updateDate},
+		#{oldLevel},
+		#{newLevel},
+		#{ischeck},
+		#{performance}
+		)
+	</insert>
+
+	<update id="update">
+		UPDATE user_level_log SET
+		ischeck = #{ischeck}
+		WHERE id = #{id}
+	</update>
+
+
+</mapper>
