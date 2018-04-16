@@ -1,0 +1,224 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.user.dao.SystemReportDao">
+    
+	<sql id="systemReportColumns">
+		a.id AS "id",
+		a.user_name AS "userName",
+		a.dividend_one AS "dividendOne",
+		a.dividend_two AS "dividendTwo",
+		a.dividend_three AS "dividendThree",
+		a.dividend_four AS "dividendFour",
+		a.dividend_five AS "dividendFive",
+		a.dividend_six AS "dividendSix",
+		a.dividend_seven AS "dividendSeven",
+		a.dividend_eight AS "dividendEight",
+		a.dividend_nine AS "dividendNine",
+		a.dividend_ten AS "dividendTen",
+		a.dividend_eleven AS "dividendEleven",
+		a.dividend_twelve AS "dividendTwelve",
+		a.dividend_thirteen AS "dividendThirteen",
+		a.dividend_fourteen AS "dividendFourteen",
+		a.dividend_fifteen AS "dividendFifteen",
+		a.is_check AS "isCheck",
+		a.status AS "status",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="systemReportJoins">
+	</sql>
+    
+	<select id="get" resultType="SystemReport">
+		SELECT 
+			<include refid="systemReportColumns"/>
+		FROM system_report a
+		<include refid="systemReportJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="SystemReport">
+		SELECT 
+
+			<include refid="systemReportColumns"/>
+		FROM system_report a
+		<include refid="systemReportJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="createDate != null and createDate != ''">
+				AND DATE_FORMAT(a.create_date, '%Y-%m-%d') = DATE_FORMAT(#{createDate}, '%Y-%m-%d')
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="SystemReport">
+		SELECT 
+			<include refid="systemReportColumns"/>
+		FROM system_report a
+		<include refid="systemReportJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO system_report(
+			id,
+			user_name,
+			dividend_one,
+			dividend_two,
+			dividend_three,
+			dividend_four,
+			dividend_five,
+			dividend_six,
+			dividend_seven,
+			dividend_eight,
+			dividend_nine,
+			dividend_ten,
+			dividend_eleven,
+			dividend_twelve,
+			dividend_thirteen,
+			dividend_fourteen,
+			dividend_fifteen,
+			is_check,
+			status,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{userName},
+			#{dividendOne},
+			#{dividendTwo},
+			#{dividendThree},
+			#{dividendFour},
+			#{dividendFive},
+			#{dividendSix},
+			#{dividendSeven},
+			#{dividendEight},
+			#{dividendNine},
+			#{dividendTen},
+			#{dividendEleven},
+			#{dividendTwelve},
+			#{dividendThirteen},
+			#{dividendFourteen},
+			#{dividendFifteen},
+			#{isCheck},
+			#{status},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE system_report SET 	
+			user_name = #{userName},
+			dividend_one = #{dividendOne},
+			dividend_two = #{dividendTwo},
+			dividend_three = #{dividendThree},
+			dividend_four = #{dividendFour},
+			dividend_five = #{dividendFive},
+			dividend_six = #{dividendSix},
+			dividend_seven = #{dividendSeven},
+			dividend_eight = #{dividendEight},
+			dividend_nine = #{dividendNine},
+			dividend_ten = #{dividendTen},
+			dividend_eleven = #{dividendEleven},
+			dividend_twelve = #{dividendTwelve},
+			dividend_thirteen = #{dividendThirteen},
+			dividend_fourteen = #{dividendFourteen},
+			dividend_fifteen = #{dividendFifteen},
+			is_check = #{isCheck},
+			status = #{status},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+
+	<update id="updateSystemReportByType">
+		UPDATE system_report SET
+		<choose>
+			<when test="reportType==1">
+				dividend_one = #{money}
+			</when>
+			<when test="reportType==2">
+				dividend_two = #{money}
+			</when>
+			<when test="reportType==3">
+				dividend_three = #{money}
+			</when>
+			<when test="reportType==4">
+				dividend_four = #{money}
+			</when>
+			<when test="reportType==5">
+				dividend_five = dividend_five + #{money}
+			</when>
+			<when test="reportType==6">
+				dividend_six = dividend_six + #{money}
+			</when>
+			<when test="reportType==7">
+				dividend_seven = dividend_seven + #{money}
+			</when>
+			<when test="reportType==8">
+				dividend_eight = dividend_eight + #{money}
+			</when>
+			<when test="reportType==9">
+				dividend_nine = dividend_nine + #{money}
+			</when>
+			<when test="reportType==10">
+				dividend_ten = dividend_ten + #{money}
+			</when>
+			<when test="reportType==11">
+				dividend_eleven = dividend_eleven + #{money}
+			</when>
+			<when test="reportType==12">
+				dividend_twelve = dividend_twelve + #{money}
+			</when>
+			<when test="reportType==13">
+				dividend_thirteen = dividend_thirteen + #{money}
+			</when>
+			<when test="reportType==14">
+				dividend_fourteen = dividend_fourteen + #{money}
+			</when>
+			<when test="reportType==15">
+				dividend_fifteen = dividend_fifteen + #{money}
+			</when>
+		</choose>
+		WHERE id = #{id}
+	</update>
+
+	<update id="delete">
+		UPDATE system_report SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

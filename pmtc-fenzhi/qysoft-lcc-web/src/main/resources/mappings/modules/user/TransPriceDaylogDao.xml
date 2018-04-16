@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.user.dao.TransPriceDaylogDao">
+
+    <sql id="transPriceDaylogColumns">
+		a.id AS "id",
+		a.group_id AS "groupId",
+		a.now_money AS "nowMoney",
+		a.start_money AS "startMoney",
+		a.end_money AS "endMoney",
+		a.hig_money AS "higMoney",
+		a.low_money AS "lowMoney",
+		a.amount AS "amount",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.add_date AS "addDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+
+    <sql id="transPriceDaylogJoins">
+    </sql>
+
+    <select id="get" resultType="TransPriceDaylog">
+        SELECT
+        <include refid="transPriceDaylogColumns"/>
+        FROM trans_price_daylog a
+        <include refid="transPriceDaylogJoins"/>
+        WHERE a.id = #{id}
+    </select>
+
+    <select id="findList" resultType="TransPriceDaylog">
+        SELECT
+
+        <include refid="transPriceDaylogColumns"/>
+        FROM trans_price_daylog a
+        <include refid="transPriceDaylogJoins"/>
+        <where>
+            a.del_flag = #{DEL_FLAG_NORMAL}
+            <if test="nowMoney != null and nowMoney != ''">
+                AND a.now_money = #{nowMoney}
+            </if>
+            <if test="startMoney != null and startMoney != ''">
+                AND a.start_money = #{startMoney}
+            </if>
+            <if test="endMoney != null and endMoney != ''">
+                AND a.end_money = #{endMoney}
+            </if>
+            <if test="higMoney != null and higMoney != ''">
+                AND a.hig_money = #{higMoney}
+            </if>
+            <if test="lowMoney != null and lowMoney != ''">
+                AND a.low_money = #{lowMoney}
+            </if>
+            <if test="amount != null and amount != ''">
+                AND a.amount = #{amount}
+            </if>
+            <if test="createDate != null and createDate != ''">
+                AND a.create_date = #{createDate}
+            </if>
+        </where>
+        <choose>
+            <when test="page !=null and page.orderBy != null and page.orderBy != ''">
+                ORDER BY ${page.orderBy}
+            </when>
+            <otherwise>
+                ORDER BY a.create_date ASC
+            </otherwise>
+        </choose>
+    </select>
+
+    <select id="findAllList" resultType="TransPriceDaylog">
+        SELECT
+        <include refid="transPriceDaylogColumns"/>
+        FROM trans_price_daylog a
+        <include refid="transPriceDaylogJoins"/>
+        <where>
+            a.del_flag = #{DEL_FLAG_NORMAL}
+        </where>
+        <choose>
+            <when test="page !=null and page.orderBy != null and page.orderBy != ''">
+                ORDER BY ${page.orderBy}
+            </when>
+            <otherwise>
+                ORDER BY a.update_date DESC
+            </otherwise>
+        </choose>
+    </select>
+
+    <select id="findWeekData" resultType="TransPriceDaylog">
+		select MIN(a.id) minId,MAX(a.id) maxId,MAX(a.hig_money) higMoney,MIN(a.low_money) lowMoney,MAX(a.create_date) create_date,DATE_FORMAT(a.create_date,'%Y%u') weeks from trans_price_daylog a group by weeks
+	</select>
+
+	<select id="findMonthData" resultType="TransPriceDaylog">
+		select MIN(a.id) minId,MAX(a.id) maxId,MAX(a.hig_money) higMoney,MIN(a.low_money) lowMoney,MAX(a.create_date) create_date,DATE_FORMAT(a.create_date,'%Y%m') weeks from trans_price_daylog a group by weeks
+	</select>
+
+    <insert id="insert">
+		INSERT INTO trans_price_daylog(
+			id,
+			group_id,
+			now_money,
+			start_money,
+			end_money,
+			hig_money,
+			low_money,
+			amount,
+			create_by,
+			create_date,
+			add_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{groupId},
+			#{nowMoney},
+			#{startMoney},
+			#{endMoney},
+			#{higMoney},
+			#{lowMoney},
+			#{amount},
+			#{createBy.id},
+			#{createDate},
+			#{addDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+
+    <update id="update">
+		UPDATE trans_price_daylog SET 	
+			group_id = #{groupId},
+			now_money = #{nowMoney},
+			start_money = #{startMoney},
+			end_money = #{endMoney},
+			hig_money = #{higMoney},
+			low_money = #{lowMoney},
+			amount = #{amount},
+			add_date = #{addDate},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+
+    <update id="delete">
+		UPDATE trans_price_daylog SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+
+</mapper>

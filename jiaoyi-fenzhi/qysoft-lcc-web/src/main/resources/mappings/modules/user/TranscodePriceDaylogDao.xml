@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.user.dao.TranscodePriceDaylogDao">
+    
+	<sql id="transcodePriceDaylogColumns">
+		a.id AS "id",
+		a.start_money AS "startMoney",
+		a.now_money AS "nowMoney",
+		a.amount AS "amount",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="transcodePriceDaylogJoins">
+	</sql>
+    
+	<select id="get" resultType="TranscodePriceDaylog">
+		SELECT 
+			<include refid="transcodePriceDaylogColumns"/>
+		FROM transcode_price_daylog a
+		<include refid="transcodePriceDaylogJoins"/>
+		WHERE a.id = #{id}
+	</select>
+
+	<select id="getNowLog" resultType="TranscodePriceDaylog">
+		SELECT
+		<include refid="transcodePriceDaylogColumns"/>
+		FROM transcode_price_daylog a
+		<include refid="transcodePriceDaylogJoins"/>
+		ORDER BY a.create_date DESC
+		limit 1
+	</select>
+	
+	<select id="findList" resultType="TranscodePriceDaylog">
+		SELECT 
+
+			<include refid="transcodePriceDaylogColumns"/>
+		FROM transcode_price_daylog a
+		<include refid="transcodePriceDaylogJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="createDateBegin != null and createDateBegin != ''">
+				AND DATE_FORMAT(a.create_date, '%Y-%m-%d') &gt;= DATE_FORMAT(#{createDateBegin}, '%Y-%m-%d')
+			</if>
+			<if test="createDateEnd != null and createDateEnd != ''">
+				AND DATE_FORMAT(a.create_date, '%Y-%m-%d') &lt;= DATE_FORMAT(#{createDateEnd}, '%Y-%m-%d')
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.create_date ASC
+			</otherwise>
+		</choose>
+	</select>
+
+	<select id="findByCreateDate" resultType="TranscodePriceDaylog">
+		select * from transcode_price_daylog a WHERE  DATE_FORMAT(a.create_date, '%Y-%m-%d') = DATE_FORMAT(#{date}, '%Y-%m-%d') limit 1
+	</select>
+	
+	<select id="findAllList" resultType="TranscodePriceDaylog">
+		SELECT 
+			<include refid="transcodePriceDaylogColumns"/>
+		FROM transcode_price_daylog a
+		<include refid="transcodePriceDaylogJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO transcode_price_daylog(
+			id,
+			start_money,
+			now_money,
+			amount,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{startMoney},
+			#{nowMoney},
+			#{amount},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE transcode_price_daylog SET 	
+			start_money = #{startMoney},
+			now_money = #{nowMoney},
+			amount = #{amount},
+			update_by = #{updateBy.id},
+			create_date = #{createDate},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+
+	<update id="updateAmount">
+		UPDATE transcode_price_daylog SET
+
+		amount = amount + #{amount}
+
+		WHERE id = #{id}
+	</update>
+
+	<delete id="delete">
+		DELETE FROM transcode_price_daylog WHERE
+		id = #{id}
+	</delete>
+
+	<select id="findWeekData" resultType="TranscodePriceDaylog">
+		select sum(amount) amount,MIN(id) as minId,MAX(id) as maxId,DATE_FORMAT(create_date,'%Y%u') weeks from transcode_price_daylog  group by weeks
+	</select>
+
+	<select id="findMonthData" resultType="TranscodePriceDaylog">
+		select sum(amount) amount,MIN(id) as minId,MAX(id) as maxId,DATE_FORMAT(create_date,'%Y%m') weeks from transcode_price_daylog  group by weeks
+	</select>
+	
+</mapper>

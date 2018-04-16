@@ -1,0 +1,227 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.user.dao.TranscodeBuyDao">
+    
+	<sql id="transcodeBuyColumns">
+		a.id AS "id",
+		a.user_name AS "userName",
+		a.money AS "money",
+		a.sell_num AS "sellNum",
+		a.now_num AS "nowNum",
+		a.down_num AS "downNum",
+		a.guarantees AS "guarantees",
+		a.status AS "status",
+		a.type AS "type",
+		a.sort AS "sort",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.add_date AS "addDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="transcodeBuyJoins">
+	</sql>
+    
+	<select id="get" resultType="TranscodeBuy">
+		SELECT
+		<include refid="transcodeBuyColumns"/>
+		FROM transcode_buy a
+		<include refid="transcodeBuyJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	<select id="getLock" resultType="TranscodeBuy">
+		SELECT
+		<include refid="transcodeBuyColumns"/>
+		FROM transcode_buy a
+		<include refid="transcodeBuyJoins"/>
+		WHERE a.id = #{id}
+		FOR UPDATE
+	</select>
+	<select id="sumNowNumByTypeAndDate" resultType="BigDecimal">
+		SELECT
+		  IFNULL(sum(a.now_num),0)
+		FROM transcode_buy a
+		WHERE a.type = #{type} AND DATE_FORMAT(create_date, '%Y-%m-%d') = DATE_FORMAT(#{createDate}, '%Y-%m-%d')
+		FOR UPDATE
+	</select>
+
+	
+	<select id="findList" resultType="TranscodeBuy">
+		SELECT 
+
+			<include refid="transcodeBuyColumns"/>
+		FROM transcode_buy a
+		<include refid="transcodeBuyJoins"/>
+		<where>
+			1=1
+			<if test="id != null and id != ''">
+				AND a.id = #{id}
+			</if>
+			<if test="userName != null and userName != ''">
+				AND a.user_name = #{userName}
+			</if>
+			<if test="status != null and status != ''">
+				AND a.status = #{status}
+			</if>
+			<if test="type != null and type != ''">
+				AND a.type = #{type}
+			</if>
+			<if test="statusBegin != null and statusBegin != ''">
+				AND a.status >= #{statusBegin}
+			</if>
+			<if test="createDate != null and createDate != ''">
+				AND DATE_FORMAT(a.create_date, '%Y-%m-%d') = DATE_FORMAT(#{createDate}, '%Y-%m-%d')
+			</if>
+			<if test="createDateByMonth != null and createDateByMonth != ''">
+				AND DATE_FORMAT(a.create_date, '%Y-%m') = DATE_FORMAT(#{createDateByMonth}, '%Y-%m')
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<select id="findListLock" resultType="TranscodeBuy">
+		SELECT
+
+		<include refid="transcodeBuyColumns"/>
+		FROM transcode_buy a
+		<include refid="transcodeBuyJoins"/>
+		<where>
+			1=1
+			<if test="userName != null and userName != ''">
+				AND a.user_name = #{userName}
+			</if>
+			<if test="status != null and status != ''">
+				AND a.status = #{status}
+			</if>
+
+			<if test="type != null and type != ''">
+				AND a.type = #{type}
+			</if>
+		</where>
+		<choose>
+			<when test="orderBy != null and orderBy != ''">
+				ORDER BY ${orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.create_date
+			</otherwise>
+		</choose>
+		<if test="topLimit != null and topLimit != '' ">
+			limit 0,#{topLimit}
+		</if>
+		for update
+	</select>
+
+	
+	<select id="findAllList" resultType="TranscodeBuy">
+		SELECT 
+			<include refid="transcodeBuyColumns"/>
+		FROM transcode_buy a
+		<include refid="transcodeBuyJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO transcode_buy(
+			id,
+			user_name,
+			money,
+			sell_num,
+			now_num,
+			down_num,
+			guarantees ,
+			status,
+			type,
+			sort,
+			create_by,
+			create_date,
+			add_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{userName},
+			#{money},
+			#{sellNum},
+			#{nowNum},
+			#{downNum},
+			#{guarantees},
+			#{status},
+			#{type},
+			#{sort},
+			#{createBy.id},
+			#{createDate},
+			#{addDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE transcode_buy SET 	
+			user_name = #{userName},
+			money = #{money},
+			sell_num = #{sellNum},
+			guarantees = guarantees,
+			now_num = #{nowNum},
+			down_num = #{downNum},
+			status = #{status},
+			type = #{type},
+			sort = #{sort},
+			add_date = #{addDate},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	<update id="updateNowNumAndStatus">
+		UPDATE transcode_buy SET
+		now_num = #{nowNum},
+		status = #{status}
+		WHERE id = #{id}
+	</update>
+	<update id="updateDownNum">
+		UPDATE transcode_buy SET
+		down_num = #{downNum}
+		WHERE id = #{id}
+	</update>
+	<update id="updatRemarks">
+		UPDATE transcode_buy SET
+		remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	<update id="updatGuarantees">
+		UPDATE transcode_buy SET
+		guarantees = #{guarantees}
+		WHERE id = #{id}
+	</update>
+	<delete id="delete">
+		DELETE FROM transcode_buy WHERE
+		id = #{id}
+	</delete>
+	
+</mapper>

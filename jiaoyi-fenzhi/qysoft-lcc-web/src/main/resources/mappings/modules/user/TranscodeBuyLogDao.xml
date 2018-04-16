@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.user.dao.TranscodeBuyLogDao">
+    
+	<sql id="transcodeBuyLogColumns">
+		a.id AS "id",
+		a.buy_user_name AS "buyUserName",
+		a.sell_user_name AS "sellUserName",
+		a.buy_id AS "buyId",
+		a.sell_id AS "sellId",
+		a.num AS "num",
+		a.money AS "money",
+		a.images AS "images",
+		a.type AS "type",
+		a.status AS "status",
+		a.is_check AS "isCheck",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.add_date AS "addDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="transcodeBuyLogJoins">
+	</sql>
+    
+	<select id="get" resultType="TranscodeBuyLog">
+		SELECT 
+			<include refid="transcodeBuyLogColumns"/>
+		FROM transcode_buy_log a
+		<include refid="transcodeBuyLogJoins"/>
+		WHERE a.id = #{id}
+	</select>
+
+	<select id="getLock" resultType="TranscodeBuyLog">
+		SELECT
+		<include refid="transcodeBuyLogColumns"/>
+		FROM transcode_buy_log a
+		<include refid="transcodeBuyLogJoins"/>
+		WHERE a.id = #{id}
+		for update
+	</select>
+
+	<select id="findList" resultType="TranscodeBuyLog">
+		SELECT 
+
+			<include refid="transcodeBuyLogColumns"/>
+		FROM transcode_buy_log a
+		<include refid="transcodeBuyLogJoins"/>
+		<where>
+			1=1
+			<if test="id != null and id != ''">
+				AND a.id = #{id}
+			</if>
+			<if test="buyUserName != null and buyUserName != ''">
+				AND a.buy_user_name = #{buyUserName}
+			</if>
+			<if test="sellUserName != null and sellUserName != ''">
+				AND a.sell_user_name = #{sellUserName}
+			</if>
+			<if test="status != null and status != ''">
+				AND a.status = #{status}
+			</if>
+			<if test="statusBegin != null and statusBegin != ''">
+				AND a.status &gt;= #{statusBegin}
+			</if>
+			<if test="statusEnd != null and statusEnd != ''">
+				AND a.status &lt;= #{statusEnd}
+			</if>
+			<if test="type != null and type != ''">
+				AND a.type = #{type}
+			</if>
+			<if test="createDate != null and createDate != ''">
+				AND DATE_FORMAT(a.create_date, '%Y-%m-%d') = DATE_FORMAT(#{createDate}, '%Y-%m-%d')
+			</if>
+			<if test="allUser != null and allUser != ''">
+				AND (a.buy_user_name = #{allUser} OR a.sell_user_name = #{allUser})
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<when test="orderBy != null and orderBy != ''">
+				ORDER BY ${orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+		<if test="topLimit != null and topLimit != '' ">
+			limit 0,#{topLimit}
+		</if>
+	</select>
+	
+	<select id="findAllList" resultType="TranscodeBuyLog">
+		SELECT 
+			<include refid="transcodeBuyLogColumns"/>
+		FROM transcode_buy_log a
+		<include refid="transcodeBuyLogJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO transcode_buy_log(
+			id,
+			buy_user_name,
+			sell_user_name,
+			buy_id,
+			sell_id,
+			num,
+			money,
+			images,
+			type,
+			status,
+			is_check,
+			create_by,
+			create_date,
+			add_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{buyUserName},
+			#{sellUserName},
+			#{buyId},
+			#{sellId},
+			#{num},
+			#{money},
+			#{images},
+			#{type},
+			#{status},
+			#{isCheck},
+			#{createBy.id},
+			#{createDate},
+			#{addDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE transcode_buy_log SET 	
+			buy_user_name = #{buyUserName},
+			sell_user_name = #{sellUserName},
+			buy_id = #{buyId},
+			sell_id = #{sellId},
+			num = #{num},
+			money = #{money},
+			images = #{images},
+			type = #{type},
+			status = #{status},
+			is_check = #{isCheck},
+			add_date = #{addDate},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+
+	<delete id="delete">
+		DELETE FROM transcode_buy_log WHERE
+		id = #{id}
+	</delete>
+
+</mapper>

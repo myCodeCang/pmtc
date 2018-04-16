@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.user.dao.UserTeamLevelDao">
+    
+	<sql id="userTeamLevelColumns">
+		a.id AS "id",
+		a.team_name AS "teamName",
+		a.condition_one AS "conditionOne",
+		a.direct_people_num AS "directPeopleNum",
+		a.team_people_num AS "teamPeopleNum",
+		a.compound_interest AS "compoundInterest",
+		a.direct_earnings AS "directEarnings",
+		a.indirect_earnings AS "indirectEarnings",
+		a.every_earnings AS "everyEarnings",
+		a.team_code AS "teamCode",
+		a.indirect_levelno AS "indirectLevelno",
+		a.message AS "message",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="userTeamLevelJoins">
+	</sql>
+    
+	<select id="get" resultType="UserTeamLevel">
+		SELECT 
+			<include refid="userTeamLevelColumns"/>
+		FROM user_team_level a
+		<include refid="userTeamLevelJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="UserTeamLevel">
+		SELECT 
+
+			<include refid="userTeamLevelColumns"/>
+		FROM user_team_level a
+		<include refid="userTeamLevelJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="teamName != null and teamName != ''">
+				AND a.team_name = #{teamName}
+			</if>
+			<if test="teamCode != null and teamCode != ''">
+				AND a.team_code = #{teamCode}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<when test="orderBy !=null and orderBy != ''">
+				ORDER BY ${orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.team_code
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="UserTeamLevel">
+		SELECT 
+			<include refid="userTeamLevelColumns"/>
+		FROM user_team_level a
+		<include refid="userTeamLevelJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<select id="getTeamNameByTeamCode" resultType="UserTeamLevel">
+		SELECT
+		<include refid="userTeamLevelColumns"/>
+		FROM user_team_level a
+		<include refid="userTeamLevelJoins"/>
+		<where>
+			a.team_code = #{teamCode}
+		</where>
+	</select>
+
+	<insert id="insert">
+		INSERT INTO user_team_level(
+			id,
+			team_name,
+			condition_one,
+			compound_interest,
+			direct_people_num,
+			team_people_num,
+			direct_earnings,
+			indirect_earnings,
+			every_earnings,
+			team_code,
+			indirect_levelno,
+			message,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{teamName},
+			#{conditionOne},
+			#{compoundInterest},
+			#{directPeopleNum},
+			#{teamPeopleNum},
+			#{directEarnings},
+			#{indirectEarnings},
+			#{everyEarnings},
+			#{teamCode},
+			#{indirectLevelno},
+			#{message},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE user_team_level SET
+			condition_one = #{conditionOne},
+			compound_interest = #{compoundInterest},
+			team_name = #{teamName},
+			direct_people_num = #{directPeopleNum},
+			team_people_num = #{teamPeopleNum},
+			direct_earnings = #{directEarnings},
+			indirect_earnings = #{indirectEarnings},
+			every_earnings = #{everyEarnings},
+			team_code = #{teamCode},
+			indirect_levelno = #{indirectLevelno},
+			message = #{message},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		DELETE FROM user_team_level
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.user.dao.UserMoneyReportDao">
+    
+	<sql id="userMoneyReportColumns">
+		a.id AS "id",
+		a.user_name AS "userName",
+		a.sum_money2 AS "sumMoney2",
+		a.sum_money3 AS "sumMoney3",
+		a.sum_money4 AS "sumMoney4",
+		a.sum_money5 AS "sumMoney5",
+		a.sum_money6 AS "sumMoney6",
+		a.sum_money7 AS "sumMoney7",
+		a.sum_money8 AS "sumMoney8",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		a.is_check AS "isCheck"
+	</sql>
+	
+	<sql id="userMoneyReportJoins">
+	</sql>
+    
+	<select id="get" resultType="UserMoneyReport">
+		SELECT 
+			<include refid="userMoneyReportColumns"/>
+		FROM user_money_report a
+		<include refid="userMoneyReportJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="UserMoneyReport">
+		SELECT 
+
+			<include refid="userMoneyReportColumns"/>
+		FROM user_money_report a
+		<include refid="userMoneyReportJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="userName != null and userName != ''">
+				AND a.user_name = #{userName}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="UserMoneyReport">
+		SELECT 
+			<include refid="userMoneyReportColumns"/>
+		FROM user_money_report a
+		<include refid="userMoneyReportJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO user_money_report(
+			id,
+			user_name,
+			sum_money2,
+			sum_money3,
+			sum_money4,
+			sum_money5,
+			sum_money6,
+			sum_money7,
+			sum_money8,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag,
+			is_check
+		) VALUES (
+			#{id},
+			#{userName},
+			#{sumMoney2},
+			#{sumMoney3},
+			#{sumMoney4},
+			#{sumMoney5},
+			#{sumMoney6},
+			#{sumMoney7},
+			#{sumMoney8},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag},
+			#{isCheck}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE user_money_report SET 	
+			user_name = #{userName},
+			sum_money2 = #{sumMoney2},
+			sum_money3 = #{sumMoney3},
+			sum_money4 = #{sumMoney4},
+			sum_money5 = #{sumMoney5},
+			sum_money6 = #{sumMoney6},
+			sum_money7 = #{sumMoney7},
+			sum_money8 = #{sumMoney8},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks},
+			is_check = #{isCheck}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE user_money_report SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+
+	<update id="updateMoneyReportByType">
+		UPDATE user_money_report SET
+		<choose>
+			<when test="reportType==1">
+				sum_money2 = sum_money2 + #{money}
+			</when>
+			<when test="reportType==2">
+				sum_money3 = sum_money3 + #{money}
+			</when>
+			<when test="reportType==3">
+				sum_money4 = sum_money4 + #{money}
+			</when>
+			<when test="reportType==4">
+				sum_money5 = sum_money5 + #{money}
+			</when>
+			<when test="reportType==5">
+				sum_money6 = sum_money6 + #{money}
+			</when>
+			<when test="reportType==6">
+				sum_money7 = sum_money7 + #{money}
+			</when>
+			<when test="reportType==7">
+				sum_money8 = sum_money8 + #{money}
+			</when>
+		</choose>
+		WHERE id = #{id}
+	</update>
+	
+</mapper>
